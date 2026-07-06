@@ -275,6 +275,198 @@ select.inp{cursor:pointer}
 .monthly-total-label{font-size:11px;color:#7a8bbf;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
 .monthly-total-amount{font-size:28px;font-weight:700;color:#e8f0fe}
 .monthly-total-sub{font-size:12px;color:#5b8dee;margin-top:4px}
+
+/* Animated Catching Money Game Style */
+.catch-money-container {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(180deg, rgba(42, 120, 214, 0.03) 0%, rgba(27, 175, 122, 0.06) 100%);
+  border: 1px solid rgba(42, 120, 214, 0.12);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
+  user-select: none;
+  cursor: crosshair;
+}
+
+/* Sky/Cloud background element */
+.catch-bg-cloud {
+  position: absolute;
+  top: 15px;
+  font-size: 24px;
+  opacity: 0.15;
+  pointer-events: none;
+  animation: floatCloud 25s infinite linear;
+}
+.catch-bg-cloud-1 { left: -30px; animation-duration: 35s; }
+.catch-bg-cloud-2 { left: -50px; top: 45px; font-size: 18px; animation-duration: 25s; animation-delay: -10s; }
+
+@keyframes floatCloud {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(450px); }
+}
+
+/* Boy Character style */
+.boy-char {
+  position: absolute;
+  bottom: 8px;
+  width: 72px;
+  height: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: left 0.12s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: left;
+}
+
+/* Boy character features */
+.boy-head {
+  animation: boyHeadBob 3s infinite ease-in-out alternate;
+  transform-origin: 50px 35px;
+}
+.boy-eye {
+  animation: boyBlink 4s infinite linear;
+  transform-origin: center;
+}
+@keyframes boyHeadBob {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(1px) rotate(1deg); }
+}
+@keyframes boyBlink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+/* Falling money items */
+.money-item {
+  position: absolute;
+  pointer-events: none;
+  will-change: top, left, transform;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-weight: 900;
+  color: #fff;
+}
+.money-coin {
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+  border: 1.5px solid #d97706;
+  border-radius: 50%;
+  font-size: 10px;
+  box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3);
+  animation: spinCoin 1.2s infinite linear;
+}
+.money-bill {
+  width: 28px;
+  height: 15px;
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  border: 1.2px solid #047857;
+  border-radius: 3px;
+  font-size: 8px;
+  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.25);
+  animation: swayBill 1.5s infinite ease-in-out alternate;
+}
+
+@keyframes spinCoin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+@keyframes swayBill {
+  0% { transform: rotate(-10deg) translateX(-2px); }
+  100% { transform: rotate(10deg) translateX(2px); }
+}
+
+/* Pocket wiggle / catch reaction */
+.pocket-wiggle {
+  animation: wiggle 0.4s ease-out;
+}
+@keyframes wiggle {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.15) translateY(-2px); }
+  50% { transform: scale(0.9) translateY(1px); }
+  75% { transform: scale(1.08) translateY(-1px); }
+}
+
+/* Score counter board */
+.catch-score-board {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(42, 120, 214, 0.15);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1d65c0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 12;
+}
+.catch-score-board span {
+  color: #10b981;
+}
+
+/* Interactive Mode Badge */
+.catch-mode-badge {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  background: rgba(42, 120, 214, 0.1);
+  border-radius: 20px;
+  padding: 4px 8px;
+  font-size: 9px;
+  font-weight: 600;
+  color: #2a78d6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  z-index: 12;
+  transition: all 0.2s ease;
+}
+.catch-mode-badge.interactive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+/* Floating green text */
+.floaty-text {
+  position: absolute;
+  font-size: 12px;
+  font-weight: 800;
+  color: #10b981;
+  pointer-events: none;
+  animation: floatUp 0.8s forwards ease-out;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+  z-index: 15;
+}
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(0.8); opacity: 1; }
+  100% { transform: translateY(-40px) scale(1.2); opacity: 0; }
+}
+
+/* Spark/Star particle */
+.catch-particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: #f59e0b;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 14;
+  animation: particleBurst 0.6s forwards cubic-bezier(0.1, 0.8, 0.3, 1);
+}
+@keyframes particleBurst {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
 </style>
 </head>
 <body>
@@ -493,24 +685,39 @@ serve(async (req) =&gt; {
   </div>
   <div class="auth-wrap">
     <div class="auth-card">
-      <div class="auth-illustration-wrap">
-        <svg viewBox="0 0 100 100" width="80" height="80" class="floating-logo">
-          <circle cx="50" cy="50" r="44" fill="url(#blue-grad)" opacity="0.12" />
-          <circle cx="50" cy="50" r="44" stroke="url(#blue-grad)" stroke-width="1.5" fill="none" stroke-dasharray="5 3" class="spinning-circle" />
-          <path d="M32 42 h36 a4 4 0 0 1 4 4 v20 a4 4 0 0 1 -4 4 h-36 a4 4 0 0 1 -4 -4 v-20 a4 4 0 0 1 4 -4 z" fill="none" stroke="#2a78d6" stroke-width="3" stroke-linejoin="round" />
-          <path d="M60 49 h12 v10 h-12 z" fill="#2a78d6" stroke="#2a78d6" stroke-width="1" rx="2" />
-          <circle cx="66" cy="54" r="2" fill="#fff" />
-          <g class="bouncing-coin">
-            <circle cx="50" cy="27" r="9" fill="#eda100" />
-            <text x="50" y="31" font-family="system-ui" font-size="11" font-weight="900" fill="#fff" text-anchor="middle">₹</text>
-          </g>
-          <defs>
-            <linearGradient id="blue-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#2a78d6" />
-              <stop offset="100%" stop-color="#1d65c0" />
-            </linearGradient>
-          </defs>
-        </svg>
+      <div class="catch-money-container" id="catch-money-container">
+        <div class="catch-bg-cloud catch-bg-cloud-1">☁️</div>
+        <div class="catch-bg-cloud catch-bg-cloud-2">☁️</div>
+        <div class="catch-mode-badge" id="catch-mode-badge">Auto Catch</div>
+        <div class="catch-score-board">Saved: <span>₹</span><span id="catch-score-val">0</span></div>
+        <div class="boy-char">
+          <svg class="boy-svg" viewBox="0 0 100 100" width="100%" height="100%">
+            <g class="boy-head">
+              <path d="M34 32 C34 26, 66 26, 66 32 Z" fill="#4b3621" />
+              <circle cx="50" cy="35" r="13" fill="#ffdbac" />
+              <path d="M34 29 C34 19, 66 19, 66 29 Z" fill="#e34948" />
+              <path d="M32 29 L68 29 C68 29, 65 33, 50 33 C35 33, 32 29, 32 29 Z" fill="#c93534" />
+              <circle cx="50" cy="18" r="4.5" fill="#fff" />
+              <circle class="boy-eye" cx="44" cy="34" r="2.2" fill="#1a1a18" />
+              <circle class="boy-eye" cx="56" cy="34" r="2.2" fill="#1a1a18" />
+              <circle cx="40" cy="37" r="2.5" fill="#f09595" opacity="0.6" />
+              <circle cx="60" cy="37" r="2.5" fill="#f09595" opacity="0.6" />
+              <path d="M46 39 Q50 43 54 39" stroke="#1a1a18" stroke-width="1.8" stroke-linecap="round" fill="none" />
+            </g>
+            <g class="boy-body">
+              <path d="M35 48 C35 48, 25 78, 25 78 L75 78 C75 78, 65 48, 65 48 Z" fill="#2a78d6" />
+              <path id="boy-pocket" class="boy-pocket" d="M38 62 L62 62 C62 62, 59 75, 50 75 C41 75, 38 62, 38 62 Z" fill="#1d65c0" stroke="#fff" stroke-width="1.2" />
+              <path d="M44 62 L56 62" stroke="#13478c" stroke-width="1" />
+              <path d="M40 48 C40 48, 50 56, 60 48" stroke="#1d65c0" stroke-width="2.5" fill="none" />
+            </g>
+            <g class="boy-arms">
+              <path d="M33 50 Q21 60 36 65" stroke="#2a78d6" stroke-width="5.5" stroke-linecap="round" fill="none" />
+              <path d="M67 50 Q79 60 64 65" stroke="#2a78d6" stroke-width="5.5" stroke-linecap="round" fill="none" />
+              <circle cx="36" cy="65" r="3.5" fill="#ffdbac" />
+              <circle cx="64" cy="65" r="3.5" fill="#ffdbac" />
+            </g>
+          </svg>
+        </div>
       </div>
       <div class="tab-bar">
         <button class="tab active" id="tab-login" onclick="switchTab('login')">Log in</button>
@@ -838,6 +1045,11 @@ function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+  if(id === 'pg-auth'){
+    if(typeof CatchGame !== 'undefined') CatchGame.init();
+  } else {
+    if(typeof CatchGame !== 'undefined') CatchGame.stop();
+  }
 }
 function closeModal(id){document.getElementById(id).classList.add('hidden');}
 ['m-tx','m-budget','m-forgot','m-cal'].forEach(id=>{
@@ -2177,6 +2389,207 @@ function calcUseAmount(){
   }, 800);
 }
 /* ── End Calculator ── */
+
+/* ════════════════════════════════════════════
+   CATCHING MONEY GAME LOGIC
+════════════════════════════════════════════ */
+const CatchGame = {
+  container: null,
+  boy: null,
+  scoreVal: null,
+  modeBadge: null,
+  items: [],
+  score: 0,
+  boyX: 50, // center position in %
+  targetX: 50,
+  isHovered: false,
+  lastSpawnTime: 0,
+  animationFrameId: null,
+  
+  init() {
+    this.container = document.getElementById('catch-money-container');
+    if (!this.container) return;
+    this.boy = this.container.querySelector('.boy-char');
+    this.scoreVal = this.container.querySelector('#catch-score-val');
+    this.modeBadge = this.container.querySelector('#catch-mode-badge');
+    
+    // Reset state
+    this.items = [];
+    this.score = 0;
+    this.boyX = 50;
+    this.targetX = 50;
+    this.isHovered = false;
+    if (this.scoreVal) this.scoreVal.textContent = '0';
+    
+    // Clear old items if any
+    this.container.querySelectorAll('.money-item, .floaty-text, .catch-particle').forEach(el => el.remove());
+    
+    // Set up mouse/touch events for interactive mode
+    const moveHandler = (clientX) => {
+      const rect = this.container.getBoundingClientRect();
+      const relativeX = clientX - rect.left;
+      const pct = (relativeX / rect.width) * 100;
+      this.targetX = Math.max(8, Math.min(92, pct));
+      if (!this.isHovered) {
+        this.isHovered = true;
+        if (this.modeBadge) {
+          this.modeBadge.textContent = 'Interactive';
+          this.modeBadge.classList.add('interactive');
+        }
+      }
+    };
+    
+    this.container.addEventListener('mousemove', (e) => moveHandler(e.clientX));
+    this.container.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches[0]) {
+        moveHandler(e.touches[0].clientX);
+      }
+    }, { passive: true });
+    
+    const leaveHandler = () => {
+      this.isHovered = false;
+      if (this.modeBadge) {
+        this.modeBadge.textContent = 'Auto Catch';
+        this.modeBadge.classList.remove('interactive');
+      }
+    };
+    
+    this.container.addEventListener('mouseleave', leaveHandler);
+    this.container.addEventListener('touchend', leaveHandler);
+
+    // Start loop
+    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+    this.lastSpawnTime = Date.now();
+    this.loop();
+  },
+  
+  spawnItem() {
+    const isCoin = Math.random() > 0.4; // 60% coins, 40% paper bills
+    const itemEl = document.createElement('div');
+    itemEl.className = 'money-item ' + (isCoin ? 'money-coin' : 'money-bill');
+    itemEl.textContent = '₹';
+    
+    const startX = 8 + Math.random() * 84;
+    itemEl.style.left = startX + '%';
+    itemEl.style.top = '-20px';
+    
+    this.container.appendChild(itemEl);
+    
+    this.items.push({
+      element: itemEl,
+      x: startX,
+      y: -20,
+      speed: 1.6 + Math.random() * 1.4, // speed in pixels per frame
+      type: isCoin ? 'coin' : 'bill'
+    });
+  },
+  
+  loop() {
+    // 1. Move the boy
+    if (!this.isHovered) {
+      // AI Mode: Track the lowest falling coin/bill
+      let bestTarget = 50;
+      let lowestY = -999;
+      for (const item of this.items) {
+        if (item.y > lowestY && item.y < 112) {
+          lowestY = item.y;
+          bestTarget = item.x;
+        }
+      }
+      this.targetX = this.targetX + (bestTarget - this.targetX) * 0.08;
+    }
+    
+    this.boyX = this.boyX + (this.targetX - this.boyX) * 0.18;
+    this.boy.style.left = this.boyX + '%';
+    
+    // 2. Spawn items
+    const now = Date.now();
+    const spawnInterval = this.isHovered ? 800 : 1200;
+    if (now - this.lastSpawnTime > spawnInterval && this.items.length < 4) {
+      this.spawnItem();
+      this.lastSpawnTime = now;
+    }
+    
+    // 3. Move items and check collisions
+    const containerHeight = 150;
+    const catchYStart = 106;
+    const catchYEnd = 124;
+    const activeItems = [];
+    
+    for (const item of this.items) {
+      item.y += item.speed;
+      item.element.style.top = item.y + 'px';
+      
+      let caught = false;
+      if (item.y >= catchYStart && item.y <= catchYEnd) {
+        const dx = Math.abs(item.x - this.boyX);
+        if (dx < 9) { // Catch range
+          caught = true;
+          this.handleCatch(item);
+        }
+      }
+      
+      if (caught) {
+        item.element.remove();
+      } else if (item.y > containerHeight) {
+        item.element.remove();
+      } else {
+        activeItems.push(item);
+      }
+    }
+    this.items = activeItems;
+    
+    this.animationFrameId = requestAnimationFrame(() => this.loop());
+  },
+  
+  handleCatch(item) {
+    const val = item.type === 'coin' ? 10 : 100;
+    this.score += val;
+    if (this.scoreVal) this.scoreVal.textContent = this.score;
+    
+    this.boy.classList.remove('pocket-wiggle');
+    void this.boy.offsetWidth; // trigger reflow
+    this.boy.classList.add('pocket-wiggle');
+    
+    const floaty = document.createElement('div');
+    floaty.className = 'floaty-text';
+    floaty.textContent = '+₹' + val;
+    floaty.style.left = `calc(${this.boyX}% - 10px)`;
+    floaty.style.top = '75px';
+    this.container.appendChild(floaty);
+    setTimeout(() => floaty.remove(), 800);
+    
+    const particleCount = 6;
+    const centerX = `calc(${this.boyX}% - 2px)`;
+    const centerY = '115px';
+    
+    for (let i = 0; i < particleCount; i++) {
+      const p = document.createElement('div');
+      p.className = 'catch-particle';
+      p.style.left = centerX;
+      p.style.top = centerY;
+      
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 15 + Math.random() * 25;
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist - 10;
+      
+      p.style.setProperty('--dx', dx + 'px');
+      p.style.setProperty('--dy', dy + 'px');
+      p.style.background = Math.random() > 0.5 ? '#f59e0b' : '#10b981';
+      
+      this.container.appendChild(p);
+      setTimeout(() => p.remove(), 600);
+    }
+  },
+  
+  stop() {
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+  }
+};
 
 </script>
 </body>
