@@ -1,0 +1,2183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Detector</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f1efe8;color:#1a1a18;min-height:100vh}
+.page{min-height:100vh;display:none}.page.active{display:block}.hidden{display:none!important}
+.btn{padding:9px 18px;border-radius:10px;border:1px solid rgba(0,0,0,.14);background:#fff;color:#1a1a18;cursor:pointer;font-size:14px;font-weight:600;transition:all .25s cubic-bezier(0.4, 0, 0.2, 1);font-family:inherit}
+.btn:hover{background:#f5f4f0;border-color:rgba(0,0,0,.2);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.05)}
+.btn:active{transform:translateY(0);box-shadow:none}
+.btn-primary{background:linear-gradient(135deg, #2a78d6 0%, #1d65c0 100%);color:#fff;border:none;box-shadow:0 4px 14px rgba(42,120,214,0.25)}
+.btn-primary:hover{background:linear-gradient(135deg, #388af2 0%, #206ecf 100%);color:#fff;transform:translateY(-2px);box-shadow:0 6px 20px rgba(42,120,214,0.35)}
+.btn-primary:active{transform:translateY(0);box-shadow:0 4px 10px rgba(42,120,214,0.2)}
+.btn-danger{background:#e34948;color:#fff;border-color:#e34948;padding:4px 10px;font-size:12px}
+.btn-danger:hover{background:#d23534;transform:translateY(-1px)}
+.btn-sm{padding:5px 13px;font-size:12px}
+.btn-outline{background:#fff;border:1.5px solid #2a78d6;color:#2a78d6}
+.btn-outline:hover{background:#E6F1FB;transform:translateY(-2px);box-shadow:0 4px 12px rgba(42,120,214,0.08)}
+.inp{width:100%;padding:11px 14px;border:1.5px solid rgba(0,0,0,.12);border-radius:10px;background:#fff;color:#1a1a18;font-size:14px;font-family:inherit;transition:all .2s ease;-moz-appearance:textfield}
+.inp::-webkit-outer-spin-button,.inp::-webkit-inner-spin-button{-webkit-appearance:none}
+.inp:focus{outline:none;border-color:#2a78d6;box-shadow:0 0 0 4px rgba(42,120,214,.12);transform:translateY(-1px)}
+select.inp{cursor:pointer}
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;color:#5f5e5a;margin-bottom:5px;display:block;font-weight:600;letter-spacing:.02em}
+.err-msg{font-size:12px;color:#e34948;margin-top:5px;display:block;min-height:16px}
+.ok-msg{font-size:12px;color:#0F6E56;margin-top:5px;padding:7px 10px;background:#E1F5EE;border-radius:6px;display:block}
+
+/* ── Nav ── */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid rgba(0,0,0,.09);background:#fff;position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.logo{font-size:18px;font-weight:700;color:#1a1a18}.logo span{color:#2a78d6}
+.container{padding:20px 24px;max-width:960px;margin:0 auto}
+
+/* ── Grid ── */
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+
+/* ── Cards ── */
+.card{background:#fff;border:1px solid rgba(0,0,0,.09);border-radius:12px;padding:1rem 1.25rem}
+.metric{background:#e8e6de;border-radius:8px;padding:1rem;text-align:center}
+.metric-label{font-size:12px;color:#5f5e5a;margin-bottom:6px;font-weight:500}
+.metric-val{font-size:21px;font-weight:700;color:#1a1a18}
+.metric-sub{font-size:11px;color:#888780;margin-top:3px}
+.prog-wrap{background:rgba(0,0,0,.1);border-radius:4px;height:8px;overflow:hidden;margin-top:8px}
+.prog-bar{height:100%;border-radius:4px;transition:width .4s}
+
+/* ── Alerts ── */
+.alert{border-radius:10px;padding:13px 16px;margin:12px 0;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;line-height:1.5}
+.alert-green{background:#E1F5EE;color:#0F6E56;border:1px solid #9FE1CB}
+.alert-orange{background:#FFEFD9;color:#9A5B0A;border:1px solid #FFCC80}
+.alert-yellow{background:#FEF9C3;color:#854D0E;border:1px solid #FDE047}
+.alert-red{background:#FCEBEB;color:#A32D2D;border:1px solid #F7C1C1}
+.alert-info{background:#E6F1FB;color:#185FA5;border:1px solid #B5D4F4}
+
+/* ── Month cards ── */
+.month-card{background:#fff;border:1px solid rgba(0,0,0,.09);border-radius:12px;padding:.9rem;cursor:pointer;transition:all .15s;text-align:center}
+.month-card:hover{border-color:#2a78d6;background:#E6F1FB;transform:translateY(-2px)}
+
+/* ── Date blocks ── */
+.date-block{background:#fff;border:1px solid rgba(0,0,0,.09);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.date-hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f5f4f0;cursor:pointer;transition:background .12s;user-select:none}
+.date-hdr:hover{background:#e8e6de}
+.date-body{padding:12px 14px;display:none}
+.tx-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.07)}
+.tx-row:last-child{border-bottom:none}
+.cat-badge{font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap;font-weight:600}
+
+/* ── Back button ── */
+.back-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px 8px 10px;border-radius:24px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#e8f0fe;cursor:pointer;font-size:13px;font-weight:600;transition:all .18s;font-family:inherit}
+.back-btn:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.45);transform:translateX(-2px)}
+.back-arrow{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;transition:all .18s;font-size:14px}
+.back-btn:hover .back-arrow{background:#2a78d6}
+
+/* ── Month nav (dark) ── */
+.nav-dark{background:#1a2744;border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 1px 6px rgba(0,0,0,.3)}
+.nav-dark .logo{color:#e8f0fe}.nav-dark .logo span{color:#5b8dee}
+
+/* ── Budget prompt ── */
+.budget-prompt{background:#FFF9E6;border:1.5px solid #F59E0B;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+
+/* ── MODAL ── */
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}
+.modal-dark{background:#1a2744;border-radius:20px;width:min(460px,94vw);max-height:92vh;overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.1);box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.modal-light{background:#fff;border-radius:20px;width:min(480px,94vw);max-height:92vh;overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(0,0,0,.1);box-shadow:0 16px 48px rgba(0,0,0,.15)}
+.modal-hdr-dark{padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between}
+.modal-hdr-light{padding:18px 20px 14px;border-bottom:1px solid rgba(0,0,0,.09);display:flex;align-items:center;justify-content:space-between}
+.modal-title-dark{font-size:15px;font-weight:700;color:#e8f0fe}
+.modal-title-light{font-size:15px;font-weight:700;color:#1a1a18}
+.modal-close-dark{width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:#94a3c4;font-family:inherit;transition:all .15s}
+.modal-close-dark:hover{background:rgba(255,255,255,.18);color:#fff}
+.modal-close-light{width:30px;height:30px;border-radius:50%;border:1px solid rgba(0,0,0,.12);background:#f5f4f0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:#5f5e5a;font-family:inherit;transition:all .15s}
+.modal-close-light:hover{background:#e8e6de;color:#1a1a18}
+.modal-body{padding:22px;overflow-y:auto;flex:1}
+.modal-ftr-dark{padding:14px 22px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:8px;justify-content:flex-end}
+.modal-ftr-light{padding:14px 22px;border-top:1px solid rgba(0,0,0,.09);display:flex;gap:8px;justify-content:flex-end}
+
+/* Dark modal inputs */
+.d-label{font-size:11px;color:#7a8bbf;margin-bottom:6px;display:block;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.d-group{margin-bottom:18px}
+.amt-wrap{position:relative}
+.amt-pre{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:20px;font-weight:700;color:#4a6fa8;pointer-events:none}
+.amt-inp-dark{width:100%;padding:12px 16px 12px 36px;border:1.5px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.07);color:#e8f0fe;font-size:26px;font-weight:700;-moz-appearance:textfield;transition:border-color .15s;font-family:inherit}
+.amt-inp-dark::-webkit-outer-spin-button,.amt-inp-dark::-webkit-inner-spin-button{-webkit-appearance:none}
+.amt-inp-dark:focus{outline:none;border-color:#5b8dee;background:rgba(255,255,255,.1)}
+.amt-inp-dark::placeholder{color:#3a4d72}
+.d-inp{width:100%;padding:10px 14px;border:1.5px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.07);color:#e8f0fe;font-size:14px;transition:border-color .15s;font-family:inherit}
+.d-inp:focus{outline:none;border-color:#5b8dee}
+.d-inp::placeholder{color:#3a4d72}
+.d-time{width:100%;padding:10px 14px;border:1.5px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.07);color:#e8f0fe;font-size:15px;font-family:inherit}
+.d-time:focus{outline:none;border-color:#5b8dee}
+.d-err{font-size:12px;color:#f09595;margin-top:5px;min-height:16px;display:block}
+
+/* Light modal inputs */
+.l-label{font-size:12px;color:#5f5e5a;margin-bottom:5px;display:block;font-weight:700}
+.l-group{margin-bottom:14px}
+.amt-inp-light{width:100%;padding:12px 16px 12px 36px;border:1.5px solid rgba(0,0,0,.15);border-radius:12px;background:#f5f4f0;color:#1a1a18;font-size:26px;font-weight:700;-moz-appearance:textfield;transition:all .15s;font-family:inherit}
+.amt-inp-light::-webkit-outer-spin-button,.amt-inp-light::-webkit-inner-spin-button{-webkit-appearance:none}
+.amt-inp-light:focus{outline:none;border-color:#2a78d6;background:#fff;box-shadow:0 0 0 3px rgba(42,120,214,.1)}
+.amt-inp-light::placeholder{color:#b4b2a9}
+.l-inp{width:100%;padding:10px 13px;border:1.5px solid rgba(0,0,0,.15);border-radius:10px;background:#f5f4f0;color:#1a1a18;font-size:14px;font-family:inherit;transition:all .15s}
+.l-inp:focus{outline:none;border-color:#2a78d6;background:#fff;box-shadow:0 0 0 3px rgba(42,120,214,.1)}
+.l-inp::placeholder{color:#b4b2a9}
+.l-err{font-size:12px;color:#e34948;margin-top:5px;min-height:16px;display:block}
+.l-ok{font-size:12px;color:#0F6E56;margin-top:5px;padding:7px 10px;background:#E1F5EE;border-radius:6px;display:none}
+
+/* Modal buttons */
+.m-cancel-dark{padding:9px 20px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#94a3c4;cursor:pointer;font-size:14px;font-weight:500;font-family:inherit;transition:all .15s}
+.m-cancel-dark:hover{background:rgba(255,255,255,.14);color:#e8f0fe}
+.m-cancel-light{padding:9px 20px;border-radius:10px;border:1px solid rgba(0,0,0,.13);background:#f5f4f0;color:#5f5e5a;cursor:pointer;font-size:14px;font-weight:500;font-family:inherit;transition:all .15s}
+.m-cancel-light:hover{background:#e8e6de;color:#1a1a18}
+.m-save{padding:9px 22px;border-radius:10px;border:none;background:#2a78d6;color:#fff;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit;transition:all .15s}
+.m-save:hover{background:#1d65c0}
+.m-save:disabled{background:#94a3c4;cursor:not-allowed}
+
+/* Category pills */
+.cat-pills{display:flex;flex-wrap:wrap;gap:6px}
+.cat-pill{padding:7px 14px;border-radius:20px;border:1.5px solid rgba(255,255,255,.12);cursor:pointer;font-size:12px;font-weight:600;color:#94a3c4;background:rgba(255,255,255,.05);transition:all .12s;font-family:inherit}
+.cat-pill:hover{border-color:rgba(255,255,255,.3);color:#e8f0fe}
+.cat-pill.sel{color:#fff;border-color:transparent}
+
+/* Auth */
+.auth-wrap{position:relative;z-index:5;max-width:420px;width:100%;margin:40px auto;padding:0 20px}
+.auth-card{background:rgba(255,255,255,0.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.6);border-radius:24px;padding:2.2rem 2rem;box-shadow:0 16px 40px rgba(0,0,0,0.06),0 2px 6px rgba(0,0,0,0.02);transition:transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),box-shadow 0.3s ease}
+.auth-card:hover{transform:translateY(-5px);box-shadow:0 24px 48px rgba(0,0,0,0.1)}
+.tab-bar{display:flex;gap:4px;padding:5px;background:rgba(0,0,0,0.05);border-radius:12px;margin-bottom:1.6rem;border:1px solid rgba(0,0,0,0.02)}
+.tab{flex:1;text-align:center;padding:9px;border-radius:9px;cursor:pointer;font-size:13.5px;font-weight:700;color:#5f5e5a;border:none;background:transparent;font-family:inherit;transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1)}
+.tab:hover{color:#1a1a18}
+.tab.active{background:#fff;color:#2a78d6;box-shadow:0 4px 12px rgba(42,120,214,0.15)}
+.auth-sub{font-size:13.5px;color:#5f5e5a;margin-bottom:1.6rem;line-height:1.6;text-align:center}
+
+/* Auth Header SVG Animation */
+.auth-illustration-wrap {display:flex;justify-content:center;margin-bottom:1.5rem}
+.floating-logo {animation:floatLogo 4s infinite alternate ease-in-out;transform-origin:center}
+.spinning-circle {animation:spinCircle 24s infinite linear;transform-origin:50px 50px}
+.bouncing-coin {animation:bounceCoin 2.6s infinite ease-in-out;transform-origin:50px 28px}
+@keyframes floatLogo {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-7px) rotate(1deg); }
+}
+@keyframes spinCircle {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes bounceCoin {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  45% { transform: translateY(-9px) scaleX(1.08) scaleY(1.08); }
+  55% { transform: translateY(-9px) scaleX(0.95) scaleY(0.95); }
+}
+
+/* Background floating glow bubbles */
+.pg-auth-bg {position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.bg-bubble {position:absolute;border-radius:50%;background:linear-gradient(135deg,rgba(42,120,214,0.16) 0%,rgba(27,175,122,0.08) 100%);filter:blur(60px);animation:floatBubble 15s infinite alternate ease-in-out}
+.bg-bubble-1 {width:350px;height:350px;top:-100px;left:-100px}
+.bg-bubble-2 {width:300px;height:300px;bottom:-80px;right:-80px;animation-duration:20s;animation-delay:2s}
+@keyframes floatBubble {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(45px, 35px) scale(1.1); }
+  100% { transform: translate(-25px, 55px) scale(0.95); }
+}
+
+/* Year nav */
+.year-nav{display:flex;align-items:center;gap:12px}
+.year-btn{width:30px;height:30px;border-radius:50%;border:1px solid rgba(0,0,0,.15);background:transparent;cursor:pointer;font-size:15px;color:#1a1a18;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:all .15s}
+.year-btn:hover{background:#e8e6de}
+
+/* Landing */
+.hero{text-align:center;padding:70px 20px 50px;background:linear-gradient(135deg,#E6F1FB 0%,#E1F5EE 100%)}
+.hero h1{font-size:36px;font-weight:700;margin-bottom:14px;color:#1a1a18}
+.hero p{font-size:16px;color:#5f5e5a;max-width:520px;margin:0 auto 28px;line-height:1.7}
+.coin-anim{width:120px;height:100px;margin:0 auto 24px;position:relative}
+.locker{width:60px;height:70px;background:#2a78d6;border-radius:10px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:28px}
+.coin{width:20px;height:20px;background:#eda100;border-radius:50%;position:absolute;top:-20px;left:50%;transform:translateX(-50%);animation:coinDrop 1.8s ease-in infinite}
+.coin2{animation-delay:.6s}.coin3{animation-delay:1.2s}
+@keyframes coinDrop{0%{opacity:0;top:-20px}20%{opacity:1}80%{opacity:1;top:30px}100%{opacity:0;top:50px}}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:36px 24px;max-width:960px;margin:0 auto}
+.feat-card{background:#fff;border:1px solid rgba(0,0,0,.09);border-radius:12px;padding:1.5rem}
+.feat-card h3{font-size:15px;font-weight:700;margin-bottom:8px;color:#1a1a18}
+.feat-card p{font-size:13px;color:#5f5e5a;line-height:1.7}
+.lp-footer{padding:24px;border-top:1px solid rgba(0,0,0,.09);display:flex;justify-content:center;gap:32px;font-size:13px;background:#fff}
+.lp-footer a{color:#5f5e5a;cursor:pointer;text-decoration:none}.lp-footer a:hover{color:#1a1a18}
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:#888780;font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(0,0,0,.1)}
+
+/* Supabase setup banner */
+.setup-banner{background:#1a2744;color:#e8f0fe;border-radius:12px;padding:20px;margin-bottom:20px}
+.setup-banner h3{font-size:14px;font-weight:700;margin-bottom:12px;color:#5b8dee}
+.setup-step{display:flex;gap:10px;margin-bottom:10px;font-size:13px;line-height:1.5}
+.setup-num{width:22px;height:22px;border-radius:50%;background:#2a78d6;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.setup-inp{width:100%;padding:9px 13px;border:1.5px solid rgba(255,255,255,.15);border-radius:8px;background:rgba(255,255,255,.07);color:#e8f0fe;font-size:13px;font-family:monospace;margin-top:6px;transition:border-color .15s}
+.setup-inp:focus{outline:none;border-color:#5b8dee}
+.setup-inp::placeholder{color:#4a5a7a}
+.connected-badge{display:inline-flex;align-items:center;gap:6px;background:#E1F5EE;color:#0F6E56;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600}
+
+/* Loading spinner */
+.spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+.spinner-dark{border-color:rgba(42,120,214,.2);border-top-color:#2a78d6}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(2px)}
+.loading-card{background:#fff;border-radius:16px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+
+/* Split preview */
+.split-preview{display:flex;gap:8px;margin-top:14px}
+.split-card{flex:1;text-align:center;background:#f5f4f0;border-radius:8px;padding:10px 6px;border:1px solid rgba(0,0,0,.08)}
+.split-lbl{font-size:10px;color:#888780;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.split-val{font-size:16px;font-weight:700;color:#2a78d6;margin-top:4px}
+
+/* Forgot pw steps */
+.step-dots{display:flex;gap:8px;justify-content:center;margin-bottom:22px}
+.step-dot{width:9px;height:9px;border-radius:50%;background:#e8e6de;transition:all .3s}
+.step-dot.active{background:#2a78d6;transform:scale(1.2)}
+.step-dot.done{background:#1baf7a}
+.code-box{background:#E1F5EE;border:1.5px solid #9FE1CB;border-radius:12px;padding:18px;text-align:center;margin-bottom:16px}
+.code-display{font-size:34px;font-weight:700;color:#0a6b65;letter-spacing:8px;margin:6px 0;font-family:monospace}
+.code-inp-style{text-align:center;letter-spacing:8px;font-size:24px;font-weight:700;font-family:monospace}
+
+/* Supabase tag */
+.sb-tag{display:inline-flex;align-items:center;gap:5px;background:#3ECF8E22;color:#3ECF8E;border:1px solid #3ECF8E55;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600}
+
+/* ── CALCULATOR ── */
+.calc-btn-header{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#5b8dee;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;transition:all .15s;letter-spacing:.04em}
+.calc-btn-header:hover{background:rgba(91,141,238,.25);border-color:#5b8dee;color:#7aa8ff}
+.calc-panel{background:#0d1b2e;border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:14px;margin-bottom:14px;display:none}
+.calc-panel.open{display:block}
+.calc-display{background:#060f1a;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;margin-bottom:10px;text-align:right}
+.calc-expr{font-size:11px;color:#4a6fa8;min-height:16px;font-family:monospace;margin-bottom:3px;word-break:break-all}
+.calc-result{font-size:26px;font-weight:700;color:#e8f0fe;font-family:monospace;min-height:36px;line-height:1.2;word-break:break-all}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.calc-key{padding:12px 6px;border-radius:9px;border:none;cursor:pointer;font-size:15px;font-weight:700;font-family:monospace;transition:all .12s;display:flex;align-items:center;justify-content:center}
+.calc-key:active{transform:scale(.93)}
+.calc-num{background:rgba(255,255,255,.08);color:#e8f0fe}.calc-num:hover{background:rgba(255,255,255,.16)}
+.calc-op{background:rgba(91,141,238,.2);color:#5b8dee}.calc-op:hover{background:rgba(91,141,238,.4);color:#7aa8ff}
+.calc-eq{background:#2a78d6;color:#fff;grid-column:span 2}.calc-eq:hover{background:#1d65c0}
+.calc-clear{background:rgba(227,73,72,.2);color:#e34948}.calc-clear:hover{background:rgba(227,73,72,.4)}
+.calc-del{background:rgba(237,161,0,.2);color:#eda100}.calc-del:hover{background:rgba(237,161,0,.4)}
+.calc-use{width:100%;margin-top:8px;padding:9px;border-radius:9px;border:none;background:#1baf7a;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .15s}
+.calc-use:hover{background:#159965}
+.calc-use:disabled{background:#2a3a4a;color:#4a5a6a;cursor:not-allowed}
+
+/* ── Period breakdown rows ── */
+.period-row{border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:transform .15s}
+.period-row:hover{transform:translateY(-1px)}
+.period-label{font-size:12px;font-weight:700;margin-bottom:3px}
+.period-msg{font-size:13px;margin-top:2px;line-height:1.5}
+.period-limit{text-align:right;flex-shrink:0}
+.period-limit-lbl{font-size:10px;opacity:.7;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.period-limit-val{font-size:15px;font-weight:700;margin-top:2px}
+/* Monthly total bottom card */
+.monthly-total-card{background:linear-gradient(135deg,#1a2744,#2a3a6a);border-radius:14px;padding:16px 24px;text-align:right;border:1px solid rgba(91,141,238,.3);box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.monthly-total-label{font-size:11px;color:#7a8bbf;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.monthly-total-amount{font-size:28px;font-weight:700;color:#e8f0fe}
+.monthly-total-sub{font-size:12px;color:#5b8dee;margin-top:4px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOADING ═══════════ -->
+<div id="loading-overlay" class="loading-overlay">
+  <div class="loading-card">
+    <div class="spinner spinner-dark" style="margin:0 auto 12px"></div>
+    <p style="font-size:14px;font-weight:600;color:#1a1a18">Budget Detector</p>
+    <p style="font-size:12px;color:#888780;margin-top:4px" id="loading-msg">Starting up…</p>
+  </div>
+</div>
+
+<!-- ═══════════ LANDING ═══════════ -->
+<div id="pg-landing" class="page">
+  <div class="nav">
+    <span class="logo">Budget <span>Detector</span></span>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="sb-status-tag"></span>
+      <button class="btn btn-sm" onclick="showAuth('login')">Log in</button>
+      <button class="btn btn-primary btn-sm" onclick="showAuth('register')">Sign up free</button>
+    </div>
+  </div>
+  <div class="hero">
+    <div class="coin-anim">
+      <div class="coin"></div><div class="coin coin2"></div><div class="coin coin3"></div>
+      <div class="locker">🔒</div>
+    </div>
+    <h1>Yo! Track your money smarter.</h1>
+    <p>Real database. Real auth. Set your own grocery budget, log UPI expenses daily, and get smart alerts — all powered by <strong>Supabase</strong>.</p>
+    <button class="btn btn-primary" style="padding:13px 32px;font-size:15px;border-radius:10px" onclick="showAuth('register')">Get started — it's free</button>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card"><h3>☁️ Real backend</h3><p>Powered by Supabase — a PostgreSQL database in the cloud. Your data is safe, persistent, and accessible from any device.</p></div>
+    <div class="feat-card"><h3>🔐 Real auth</h3><p>Email/password authentication handled by Supabase Auth. Secure JWT tokens, password reset via email — no fake codes.</p></div>
+    <div class="feat-card"><h3>📊 Your own budget</h3><p>Set any budget amount you want. Smart period alerts, category tracking, analytics charts, and CSV export — all synced to the cloud.</p></div>
+  </div>
+  <div class="lp-footer"><a>About</a><a>Contact</a><a>Privacy Policy</a><a>Terms &amp; Conditions</a></div>
+</div>
+
+<!-- ═══════════ SUPABASE SETUP ═══════════ -->
+<div id="pg-setup" class="page">
+  <div class="nav">
+    <span class="logo">Budget <span>Detector</span></span>
+    <span class="sb-tag">⚡ Supabase Setup</span>
+  </div>
+  <div class="container" style="max-width:700px">
+    <div style="margin:30px 0 20px">
+      <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Connect to Supabase</h2>
+      <p style="font-size:14px;color:#5f5e5a;line-height:1.7">Follow these steps once to connect your real database. Takes about 5 minutes.</p>
+    </div>
+    <div class="setup-banner">
+      <h3>📋 Step-by-step Supabase setup</h3>
+      <div class="setup-step"><div class="setup-num">1</div><div>Go to <strong style="color:#5b8dee">supabase.com</strong> → Create a free account → New project → choose a name and password</div></div>
+      <div class="setup-step"><div class="setup-num">2</div><div>In your project → <strong style="color:#5b8dee">Settings → API</strong> → copy your <strong>Project URL</strong> and <strong>anon public key</strong></div></div>
+      <div class="setup-step"><div class="setup-num">3</div><div>Go to <strong style="color:#5b8dee">SQL Editor</strong> → paste and run the SQL below to create the 3 tables</div></div>
+      <div class="setup-step"><div class="setup-num">4</div><div>Paste your URL and key below and click <strong style="color:#5b8dee">Connect</strong></div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <p style="font-size:13px;font-weight:700;color:#1a1a18">📄 SQL to run in Supabase SQL Editor</p>
+        <button class="btn btn-sm" onclick="copySQL()"><i class="ti ti-copy" style="margin-right:4px"></i>Copy SQL</button>
+      </div>
+      <pre id="sql-block" style="background:#1a2744;color:#a8c5e8;border-radius:10px;padding:14px;font-size:11px;overflow-x:auto;line-height:1.7;font-family:monospace">-- Run this in Supabase SQL Editor
+
+-- 1. Budgets table
+create table if not exists budgets (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  year int not null,
+  month int not null,
+  amount numeric not null,
+  created_at timestamptz default now(),
+  unique(user_id, year, month)
+);
+alter table budgets enable row level security;
+create policy "Users manage own budgets" on budgets
+  for all using (auth.uid() = user_id);
+
+-- 2. Transactions table
+create table if not exists transactions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  year int not null,
+  month int not null,
+  day int not null,
+  amount numeric not null,
+  category text not null,
+  description text,
+  tx_time text,
+  created_at timestamptz default now()
+);
+alter table transactions enable row level security;
+create policy "Users manage own transactions" on transactions
+  for all using (auth.uid() = user_id);
+
+-- 3. Profiles table
+create table if not exists profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  full_name text,
+  created_at timestamptz default now()
+);
+alter table profiles enable row level security;
+create policy "Users manage own profile" on profiles
+  for all using (auth.uid() = id);
+
+-- Auto-create profile on signup
+create or replace function public.handle_new_user()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.profiles (id, full_name)
+  values (new.id, new.raw_user_meta_data->>'full_name');
+  return new;
+end;
+$$;
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- 5. Alert logs table (audit trail of every email notification sent)
+create table if not exists alert_logs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  year int not null,
+  month int not null,
+  period int not null,
+  alert_type text not null,
+  message text not null,
+  email_sent_to text,
+  created_at timestamptz default now()
+);
+alter table alert_logs enable row level security;
+create policy "Users view own alert logs" on alert_logs
+  for select using (auth.uid() = user_id);
+create policy "Users insert own alert logs" on alert_logs
+  for insert with check (auth.uid() = user_id);</pre>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="font-size:20px">📧</span>
+        <p style="font-size:14px;font-weight:700;color:#1a1a18">Enable email alerts (optional but recommended)</p>
+      </div>
+      <p style="font-size:13px;color:#5f5e5a;line-height:1.7;margin-bottom:12px">
+        To send real budget alert emails to users, deploy a Supabase <strong>Edge Function</strong> called
+        <code style="background:#f5f4f0;padding:2px 6px;border-radius:4px;font-size:12px">send-budget-alert</code>.
+        It receives the alert details (orange/yellow/red) and emails the user via a provider like Resend or SendGrid.
+      </p>
+      <div style="background:#1a2744;color:#a8c5e8;border-radius:10px;padding:14px;font-size:11px;overflow-x:auto;line-height:1.7;font-family:monospace">
+// supabase/functions/send-budget-alert/index.ts
+import { serve } from "https://deno.land/std/http/server.ts";
+
+serve(async (req) =&gt; {
+  const { to, name, alertType, message, month, year, period, spent, limit, over, pctOver } = await req.json();
+
+  const subject = `${alertType.toUpperCase()} Alert — Budget Detector (${month} ${year})`;
+  const html = `
+    &lt;h2&gt;${alertType === 'red' ? '🚨' : alertType === 'yellow' ? '🟡' : '⚠️'} ${message}&lt;/h2&gt;
+    &lt;p&gt;Period ${period} of ${month} ${year}&lt;/p&gt;
+    &lt;p&gt;Spent: ₹${spent} / Limit: ₹${limit} (₹${over} over, ${pctOver}%)&lt;/p&gt;
+  `;
+
+  // Send via Resend (resend.com) — replace with your API key
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      from: "Budget Detector &lt;alerts@yourdomain.com&gt;",
+      to, subject, html
+    })
+  });
+
+  return new Response(JSON.stringify({ ok: true }), { headers: { "Content-Type": "application/json" } });
+});</div>
+      <p style="font-size:12px;color:#888780;margin-top:10px;line-height:1.6">
+        Deploy with: <code style="background:#f5f4f0;padding:2px 6px;border-radius:4px">supabase functions deploy send-budget-alert</code><br>
+        Without this function deployed, the app still shows alerts inside the dashboard — emails are simply skipped silently.
+      </p>
+    </div>
+
+    <div class="card">
+      <p style="font-size:14px;font-weight:700;margin-bottom:16px;color:#1a1a18">🔌 Enter your Supabase credentials</p>
+      <div class="form-group">
+        <label class="form-label">Supabase Project URL</label>
+        <input class="inp" type="text" id="sb-url" placeholder="https://xyzabc.supabase.co">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Supabase Anon Public Key</label>
+        <input class="inp" type="text" id="sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5...">
+      </div>
+      <span class="err-msg" id="setup-err"></span>
+      <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap">
+        <button class="btn btn-primary" style="flex:1;padding:11px;border-radius:10px" onclick="connectSupabase()">
+          <i class="ti ti-plug" style="margin-right:6px"></i>Connect to Supabase
+        </button>
+        <button class="btn btn-outline" style="padding:11px 16px;border-radius:10px" onclick="showPage('pg-landing')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ AUTH ═══════════ -->
+<div id="pg-auth" class="page" style="position:relative;background:#f1efe8;overflow:hidden">
+  <div class="pg-auth-bg">
+    <div class="bg-bubble bg-bubble-1"></div>
+    <div class="bg-bubble bg-bubble-2"></div>
+  </div>
+  <div class="nav" style="position:relative;z-index:10;background:rgba(255,255,255,0.75);backdrop-filter:blur(10px)">
+    <span class="logo" style="cursor:pointer" onclick="showPage('pg-landing')">Budget <span>Detector</span></span>
+    <span id="auth-sb-tag" class="sb-tag" style="display:none">⚡ Supabase Auth</span>
+  </div>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-illustration-wrap">
+        <svg viewBox="0 0 100 100" width="80" height="80" class="floating-logo">
+          <circle cx="50" cy="50" r="44" fill="url(#blue-grad)" opacity="0.12" />
+          <circle cx="50" cy="50" r="44" stroke="url(#blue-grad)" stroke-width="1.5" fill="none" stroke-dasharray="5 3" class="spinning-circle" />
+          <path d="M32 42 h36 a4 4 0 0 1 4 4 v20 a4 4 0 0 1 -4 4 h-36 a4 4 0 0 1 -4 -4 v-20 a4 4 0 0 1 4 -4 z" fill="none" stroke="#2a78d6" stroke-width="3" stroke-linejoin="round" />
+          <path d="M60 49 h12 v10 h-12 z" fill="#2a78d6" stroke="#2a78d6" stroke-width="1" rx="2" />
+          <circle cx="66" cy="54" r="2" fill="#fff" />
+          <g class="bouncing-coin">
+            <circle cx="50" cy="27" r="9" fill="#eda100" />
+            <text x="50" y="31" font-family="system-ui" font-size="11" font-weight="900" fill="#fff" text-anchor="middle">₹</text>
+          </g>
+          <defs>
+            <linearGradient id="blue-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#2a78d6" />
+              <stop offset="100%" stop-color="#1d65c0" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="tab-bar">
+        <button class="tab active" id="tab-login" onclick="switchTab('login')">Log in</button>
+        <button class="tab" id="tab-register" onclick="switchTab('register')">Sign up</button>
+      </div>
+      <!-- LOGIN -->
+      <div id="auth-login">
+        <p class="auth-sub">Welcome back! Sign in with your email and password.</p>
+        <div class="form-group"><label class="form-label">Email address</label><input class="inp" type="email" id="login-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div class="form-group"><label class="form-label">Password</label><input class="inp" type="password" id="login-pw" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div style="text-align:right;margin-bottom:16px">
+          <span style="font-size:13px;color:#2a78d6;cursor:pointer;font-weight:600" onclick="openForgot()">Forgot password?</span>
+        </div>
+        <button class="btn btn-primary" style="width:100%;padding:11px;font-size:14px;border-radius:10px" id="login-btn" onclick="doLogin()">Log in</button>
+        <span class="err-msg" id="login-err"></span>
+      </div>
+      <!-- REGISTER -->
+      <div id="auth-register" class="hidden">
+        <p class="auth-sub">Create your free account.</p>
+        <div class="form-group"><label class="form-label">Full name</label><input class="inp" type="text" id="reg-name" placeholder="Your name"></div>
+        <div class="form-group"><label class="form-label">Email address</label><input class="inp" type="email" id="reg-email" placeholder="you@example.com"></div>
+        <div class="form-group"><label class="form-label">Password</label><input class="inp" type="password" id="reg-pw" placeholder="At least 6 characters"></div>
+        <div class="form-group"><label class="form-label">Confirm password</label><input class="inp" type="password" id="reg-pw2" placeholder="Repeat password" onkeydown="if(event.key==='Enter')doRegister()"></div>
+        <button class="btn btn-primary" style="width:100%;padding:11px;font-size:14px;border-radius:10px;margin-top:4px" id="register-btn" onclick="doRegister()">Create account</button>
+        <span class="err-msg" id="reg-err"></span>
+      </div>
+    </div>
+    <!-- Supabase auto-connects — no manual setup needed -->
+  </div>
+</div>
+
+<!-- ═══════════ DASHBOARD ═══════════ -->
+<div id="pg-dashboard" class="page">
+  <div class="nav">
+    <button class="btn btn-sm" onclick="openCal()" title="Calendar"><i class="ti ti-calendar"></i></button>
+    <span class="logo">Budget <span>Detector</span></span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="dash-yr" style="font-size:13px;font-weight:500;color:#5f5e5a"></span>
+      <button class="btn btn-sm" onclick="doLogout()">Log out</button>
+    </div>
+  </div>
+  <div class="container">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div>
+        <p style="font-size:15px;color:#5f5e5a">Hello, <strong id="dash-name" style="color:#1a1a18"></strong> 👋</p>
+        <p style="font-size:12px;color:#888780" id="dash-month-lbl"></p>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openBudgetModal(null,null)"><i class="ti ti-settings" style="margin-right:4px"></i>Set monthly budget</button>
+    </div>
+    <div id="dash-budget-prompt" class="budget-prompt hidden">
+      <span style="font-size:22px">💡</span>
+      <div style="flex:1;font-size:13px;color:#92400E;font-weight:500">No grocery budget set for this month. Set your own limit!</div>
+      <button class="btn btn-sm" style="background:#F59E0B;color:#fff;border-color:#F59E0B;white-space:nowrap" onclick="openBudgetModal(null,null)">Set budget →</button>
+    </div>
+    <div class="g4" style="margin-bottom:16px" id="dash-cards"></div>
+    <div id="dash-alert"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px;flex-wrap:wrap;gap:8px">
+      <span style="font-size:15px;font-weight:700">Months</span>
+      <div class="year-nav">
+        <button class="year-btn" onclick="changeYear(-1)">‹</button>
+        <span id="yr-display" style="font-size:19px;font-weight:700;min-width:56px;text-align:center"></span>
+        <button class="year-btn" onclick="changeYear(1)">›</button>
+      </div>
+    </div>
+    <div id="months-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px"></div>
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px">Spending analytics</div>
+    <div class="g2" style="margin-bottom:40px">
+      <div class="card"><div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#5f5e5a">Budget vs Total spending</div><div style="position:relative;height:200px"><canvas id="chart-bar"></canvas></div></div>
+      <div class="card"><div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#5f5e5a">Category breakdown (year)</div><div style="position:relative;height:200px"><canvas id="chart-pie"></canvas></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MONTH PAGE ═══════════ -->
+<div id="pg-month" class="page">
+  <div class="nav nav-dark">
+    <button class="back-btn" onclick="showPage('pg-dashboard');renderDash()">
+      <span class="back-arrow"><i class="ti ti-arrow-left" style="font-size:13px"></i></span>
+      <span>Dashboard</span>
+    </button>
+    <span class="logo">Budget <span>Detector</span></span>
+    <div id="month-budget-tag" style="font-size:13px;color:#94a3c4;background:rgba(255,255,255,.08);padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.12);white-space:nowrap"></div>
+  </div>
+  <div class="container" style="max-width:860px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div>
+        <p style="font-size:22px;font-weight:700" id="month-title"></p>
+        <p style="font-size:12px;color:#888780" id="month-sub"></p>
+      </div>
+      <div style="text-align:right">
+        <p style="font-size:12px;color:#5f5e5a">All categories</p>
+        <p style="font-size:24px;font-weight:700;color:#2a78d6" id="month-total">₹0</p>
+      </div>
+    </div>
+    <div id="month-budget-prompt" class="budget-prompt hidden">
+      <span style="font-size:22px">💡</span>
+      <div style="flex:1;font-size:13px;color:#92400E;font-weight:500">No budget set for this month. Set your grocery limit!</div>
+      <button class="btn btn-sm" style="background:#F59E0B;color:#fff;border-color:#F59E0B;white-space:nowrap" onclick="openBudgetModal(A.currentYear,A.currentMonth)">Set budget →</button>
+    </div>
+    <div class="g4" style="margin-bottom:16px" id="month-cards"></div>
+    <div id="month-alert"></div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <input class="inp" type="text" id="search-inp" placeholder="Search transactions…" style="max-width:220px;padding:8px 12px" oninput="renderDates()">
+      <select class="inp" id="filter-cat" style="max-width:160px;padding:8px 12px" onchange="renderDates()">
+        <option value="">All categories</option>
+        <option>Grocery</option><option>Rent</option><option>Snacks</option><option>Education</option>
+        <option>Travel</option><option>Medical</option><option>Entertainment</option><option>Others</option>
+      </select>
+      <button class="btn btn-sm" onclick="exportCSV()"><i class="ti ti-download" style="margin-right:4px"></i>CSV</button>
+    </div>
+    <div id="dates-wrap"></div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL: TRANSACTION ═══════════ -->
+<div id="m-tx" class="hidden modal-wrap">
+  <div class="modal-dark">
+    <div class="modal-hdr-dark">
+      <span class="modal-title-dark" id="tx-title">Add transaction</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="calc-btn-header" onclick="toggleCalc()" id="calc-toggle-btn" title="Open Calculator">
+          🧮 Calc
+        </button>
+        <button class="modal-close-dark" onclick="closeModal('m-tx')">×</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <!-- ── CALCULATOR PANEL ── -->
+      <div class="calc-panel" id="calc-panel">
+        <div class="calc-display">
+          <div class="calc-expr" id="calc-expr"></div>
+          <div class="calc-result" id="calc-result">0</div>
+        </div>
+        <div class="calc-grid">
+          <button class="calc-key calc-clear" onclick="calcClear()">AC</button>
+          <button class="calc-key calc-del"  onclick="calcDel()">⌫</button>
+          <button class="calc-key calc-op"   onclick="calcOp('%')">%</button>
+          <button class="calc-key calc-op"   onclick="calcOp('÷')">÷</button>
+
+          <button class="calc-key calc-num"  onclick="calcNum('7')">7</button>
+          <button class="calc-key calc-num"  onclick="calcNum('8')">8</button>
+          <button class="calc-key calc-num"  onclick="calcNum('9')">9</button>
+          <button class="calc-key calc-op"   onclick="calcOp('×')">×</button>
+
+          <button class="calc-key calc-num"  onclick="calcNum('4')">4</button>
+          <button class="calc-key calc-num"  onclick="calcNum('5')">5</button>
+          <button class="calc-key calc-num"  onclick="calcNum('6')">6</button>
+          <button class="calc-key calc-op"   onclick="calcOp('−')">−</button>
+
+          <button class="calc-key calc-num"  onclick="calcNum('1')">1</button>
+          <button class="calc-key calc-num"  onclick="calcNum('2')">2</button>
+          <button class="calc-key calc-num"  onclick="calcNum('3')">3</button>
+          <button class="calc-key calc-op"   onclick="calcOp('+')">+</button>
+
+          <button class="calc-key calc-num"  onclick="calcNum('00')">00</button>
+          <button class="calc-key calc-num"  onclick="calcNum('0')">0</button>
+          <button class="calc-key calc-num"  onclick="calcNum('.')">.</button>
+          <button class="calc-key calc-eq"   onclick="calcEquals()">=</button>
+        </div>
+        <button class="calc-use" id="calc-use-btn" onclick="calcUseAmount()" disabled>
+          ↑ Use this amount
+        </button>
+      </div>
+      <!-- ── END CALCULATOR ── -->
+      <div class="d-group">
+        <label class="d-label">Amount</label>
+        <div class="amt-wrap"><span class="amt-pre">₹</span><input class="amt-inp-dark" type="number" id="tx-amt" placeholder="0" min="0" step="1"></div>
+        <span class="d-err" id="tx-amt-err"></span>
+      </div>
+      <div class="d-group">
+        <label class="d-label">Category</label>
+        <div class="cat-pills" id="cat-pills"></div>
+      </div>
+      <div class="d-group">
+        <label class="d-label">Description</label>
+        <input class="d-inp" type="text" id="tx-desc" placeholder="e.g. Vegetables from market">
+      </div>
+      <div class="d-group" style="margin-bottom:0">
+        <label class="d-label">Time</label>
+        <input class="d-time" type="time" id="tx-time">
+      </div>
+    </div>
+    <div class="modal-ftr-dark">
+      <button class="m-cancel-dark" onclick="closeModal('m-tx')">Cancel</button>
+      <button class="m-save" id="tx-save-btn" onclick="saveTx()">Save transaction</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL: BUDGET ═══════════ -->
+<div id="m-budget" class="hidden modal-wrap">
+  <div class="modal-light">
+    <div class="modal-hdr-light">
+      <span class="modal-title-light" id="budget-modal-title">Set your grocery budget</span>
+      <button class="modal-close-light" onclick="closeModal('m-budget')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#E6F1FB;border-radius:10px;padding:13px 15px;margin-bottom:18px;font-size:13px;color:#185FA5;line-height:1.65">
+        <strong>Set any amount you want!</strong> Your budget splits across 3 periods:<br>
+        Day 1–10, Day 11–20, Day 21–end. Alerts fire when a period is over.
+      </div>
+      <div class="l-group">
+        <label class="l-label">Monthly grocery budget (₹)</label>
+        <div class="amt-wrap"><span class="amt-pre" style="color:#2a78d6">₹</span><input class="amt-inp-light" type="number" id="budget-inp" placeholder="e.g. 3000" min="1" step="1" oninput="updateBudgetPreview()"></div>
+        <span class="l-err" id="budget-err"></span>
+      </div>
+      <div id="budget-preview" style="display:none">
+        <p style="font-size:12px;font-weight:700;color:#1a1a18;margin-bottom:8px">Your budget split preview:</p>
+        <div class="split-preview" id="split-cards"></div>
+      </div>
+    </div>
+    <div class="modal-ftr-light">
+      <button class="m-cancel-light" onclick="closeModal('m-budget')">Cancel</button>
+      <button class="m-save" id="budget-save-btn" onclick="saveBudget()">Save budget</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL: FORGOT PASSWORD ═══════════ -->
+<div id="m-forgot" class="hidden modal-wrap">
+  <div class="modal-light" style="width:min(420px,94vw)">
+    <div class="modal-hdr-light">
+      <span class="modal-title-light">Reset your password</span>
+      <button class="modal-close-light" onclick="closeModal('m-forgot')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="fp-supabase" class="hidden">
+        <p style="font-size:13px;color:#5f5e5a;line-height:1.65;margin-bottom:16px">Enter your email and Supabase will send you a real password reset link.</p>
+        <div class="l-group"><label class="l-label">Email address</label><input class="l-inp" type="email" id="fp-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')fpSend()"></div>
+        <span class="l-err" id="fp-err"></span>
+        <div class="l-ok" id="fp-ok">✅ Reset email sent! Check your inbox and click the link.</div>
+        <button class="btn btn-primary" style="width:100%;padding:11px;border-radius:10px;margin-top:4px" id="fp-send-btn" onclick="fpSend()">Send reset email</button>
+      </div>
+      <!-- Fallback 3-step for local mode -->
+      <div id="fp-local" class="hidden">
+        <div class="step-dots">
+          <div class="step-dot active" id="fp-d1"></div>
+          <div class="step-dot" id="fp-d2"></div>
+          <div class="step-dot" id="fp-d3"></div>
+        </div>
+        <div id="fp-s1">
+          <p style="font-size:13px;color:#5f5e5a;margin-bottom:16px;line-height:1.65">Enter your registered email to get a reset code.</p>
+          <div class="l-group"><label class="l-label">Email address</label><input class="l-inp" type="email" id="fp-email-local" placeholder="you@example.com" onkeydown="if(event.key==='Enter')fpNext1()"></div>
+          <span class="l-err" id="fp-e1"></span>
+          <button class="btn btn-primary" style="width:100%;padding:11px;border-radius:10px;margin-top:4px" onclick="fpNext1()">Get reset code</button>
+        </div>
+        <div id="fp-s2" class="hidden">
+          <div class="code-box"><p style="font-size:12px;color:#0F6E56;font-weight:700;margin-bottom:4px">YOUR RESET CODE</p><div class="code-display" id="fp-code-show">------</div></div>
+          <div class="l-group"><label class="l-label">Enter the 6-digit code</label><input class="l-inp code-inp-style" type="text" id="fp-code-inp" placeholder="000000" maxlength="6" onkeydown="if(event.key==='Enter')fpNext2()"></div>
+          <span class="l-err" id="fp-e2"></span>
+          <button class="btn btn-primary" style="width:100%;padding:11px;border-radius:10px;margin-top:4px" onclick="fpNext2()">Verify code</button>
+          <button class="btn" style="width:100%;margin-top:8px;font-size:13px" onclick="fpBack1()">← Back</button>
+        </div>
+        <div id="fp-s3" class="hidden">
+          <p style="font-size:13px;color:#5f5e5a;margin-bottom:16px">✅ Code verified! Set your new password.</p>
+          <div class="l-group"><label class="l-label">New password</label><input class="l-inp" type="password" id="fp-pw1" placeholder="At least 6 characters"></div>
+          <div class="l-group"><label class="l-label">Confirm new password</label><input class="l-inp" type="password" id="fp-pw2" onkeydown="if(event.key==='Enter')fpNext3()"></div>
+          <span class="l-err" id="fp-e3"></span>
+          <div class="l-ok" id="fp-ok-local">Password reset! Redirecting…</div>
+          <button class="btn btn-primary" style="width:100%;padding:11px;border-radius:10px;margin-top:4px" id="fp-save-btn" onclick="fpNext3()">Reset password</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL: CALENDAR ═══════════ -->
+<div id="m-cal" class="hidden modal-wrap">
+  <div class="modal-light" style="width:320px">
+    <div class="modal-hdr-light">
+      <span class="modal-title-light">Jump to month</span>
+      <button class="modal-close-light" onclick="closeModal('m-cal')">×</button>
+    </div>
+    <div class="modal-body" id="cal-body"></div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   CONSTANTS
+════════════════════════════════════════════ */
+const CATS=['Grocery','Rent','Snacks','Education','Travel','Medical','Entertainment','Others'];
+const CC={Grocery:'#2a78d6',Rent:'#4a3aa7',Snacks:'#eda100',Education:'#1baf7a',Travel:'#2d8a2d',Medical:'#e34948',Entertainment:'#e87ba4',Others:'#73726c'};
+const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MI=['❄️','💕','🌸','🌧️','☀️','🌻','🌴','⛅','🍂','🎃','🍂','🎄'];
+const alertIcon={green:'✅',orange:'⚠️',yellow:'🟡',red:'🚨',info:'💡'};
+
+/* ════════════════════════════════════════════
+   APP STATE
+════════════════════════════════════════════ */
+const A={
+  sb:null,           // Supabase client
+  user:null,         // current user
+  profile:null,      // profile row
+  currentYear:new Date().getFullYear(),
+  currentMonth:null,
+  editTxId:null,
+  editDay:null,
+  selCat:'Grocery',
+  barChart:null,
+  pieChart:null,
+  budgetTarget:{y:null,m:null},
+  // Local cache (to avoid re-fetching every render)
+  cache:{budgets:{},transactions:{}}
+};
+
+// Local fallback users (when no Supabase)
+let localUsers={}, localFP={email:null,code:null,expiry:null};
+
+/* ════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════ */
+const isLeap=y=>(y%4===0&&y%100!==0)||y%400===0;
+const dim=(m,y)=>[31,isLeap(y)?29:28,31,30,31,30,31,31,30,31,30,31][m];
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+function showLoad(msg='Loading…'){
+  document.getElementById('loading-overlay').style.display='flex';
+  document.getElementById('loading-msg').textContent=msg;
+}
+function hideLoad(){
+  document.getElementById('loading-overlay').style.display='none';
+}
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+['m-tx','m-budget','m-forgot','m-cal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){
+    if(e.target===this) closeModal(id);
+  });
+});
+
+/* ════════════════════════════════════════════
+   SUPABASE INIT
+════════════════════════════════════════════ */
+function initSupabase(url,key){
+  try{
+    A.sb=supabase.createClient(url,key);
+    localStorage.setItem('sb_url',url);
+    localStorage.setItem('sb_key',key);
+    return true;
+  }catch(e){ return false; }
+}
+
+async function connectSupabase(){
+  const url=document.getElementById('sb-url').value.trim().replace(/\/+$/,''); // strip trailing slash
+  const key=document.getElementById('sb-key').value.trim();
+  const err=document.getElementById('setup-err');
+  if(!url||!key){err.textContent='Please enter both URL and anon key.';return}
+  if(!url.startsWith('https://')||!url.includes('supabase')){
+    err.textContent='URL should look like: https://xxxxx.supabase.co (no /rest/v1/ at end)';return;
+  }
+  showLoad('Testing connection…');
+  const ok=initSupabase(url,key);
+  if(!ok){hideLoad();err.textContent='Invalid credentials. Please check and retry.';return;}
+  try{
+    const {data,error}=await A.sb.from('budgets').select('count').limit(1);
+    if(error&&error.message.includes('does not exist')){
+      hideLoad();err.textContent='Tables not found. Make sure you ran the SQL script first.';return;
+    }
+    // ── CRITICAL FIX: Save credentials to localStorage so ALL devices auto-connect ──
+    localStorage.setItem('sb_url', url);
+    localStorage.setItem('sb_key', key);
+    hideLoad();
+    document.getElementById('sb-status-tag').innerHTML='<span class="connected-badge">🟢 Supabase Connected</span>';
+    document.getElementById('auth-sb-tag').style.display='';
+    const {data:{session}}=await A.sb.auth.getSession();
+    if(session){await loadUserAndGo(session.user);}
+    else{showPage('pg-auth');switchTab('login');}
+  }catch(e){
+    hideLoad();
+    err.textContent='Connection failed: '+e.message;
+  }
+}
+
+function copySQL(){
+  const sql=document.getElementById('sql-block').textContent;
+  navigator.clipboard.writeText(sql).then(()=>{
+    const btn=event.target.closest('button');
+    const orig=btn.innerHTML;
+    btn.innerHTML='<i class="ti ti-check" style="margin-right:4px"></i>Copied!';
+    setTimeout(()=>btn.innerHTML=orig,2000);
+  });
+}
+
+/* ════════════════════════════════════════════
+   AUTH — SUPABASE
+════════════════════════════════════════════ */
+function showAuth(tab){showPage('pg-auth');switchTab(tab);}
+function switchTab(tab){
+  document.getElementById('auth-login').classList.toggle('hidden',tab!=='login');
+  document.getElementById('auth-register').classList.toggle('hidden',tab!=='register');
+  document.getElementById('tab-login').classList.toggle('active',tab==='login');
+  document.getElementById('tab-register').classList.toggle('active',tab==='register');
+  document.getElementById('login-err').textContent='';
+  document.getElementById('reg-err').textContent='';
+}
+
+async function doRegister(){
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const pw=document.getElementById('reg-pw').value;
+  const pw2=document.getElementById('reg-pw2').value;
+  const err=document.getElementById('reg-err');
+  // Validate inputs first
+  if(!name||!email||!pw||!pw2){err.textContent='All fields required.';return}
+  if(pw.length<6){err.textContent='Password must be at least 6 characters.';return}
+  if(pw!==pw2){err.textContent='Passwords do not match.';return}
+  // Must have Supabase connected
+  if(!A.sb){
+    err.textContent='Not connected to database. Please set up Supabase first.';
+    return;
+  }
+  const btn=document.getElementById('register-btn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>';
+  const {data,error}=await A.sb.auth.signUp({
+    email,
+    password:pw,
+    options:{data:{full_name:name}}
+  });
+  btn.disabled=false;
+  btn.textContent='Create account';
+  if(error){err.textContent=error.message;return;}
+  if(data.user && data.session){
+    // Signed in immediately (email confirmation disabled)
+    await loadUserAndGo(data.user);
+  } else if(data.user && !data.session){
+    err.textContent='';
+    err.style.color='#0F6E56';
+    err.textContent='Account created! Please check your email to confirm, then log in.';
+  } else {
+    err.textContent='Something went wrong. Please try again.';
+  }
+}
+
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const pw=document.getElementById('login-pw').value;
+  const err=document.getElementById('login-err');
+  if(!email||!pw){err.textContent='Please enter your email and password.';return}
+  // Must have Supabase connected
+  if(!A.sb){
+    err.textContent='Not connected to database. Please set up Supabase first.';
+    return;
+  }
+  const btn=document.getElementById('login-btn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>';
+  const {data,error}=await A.sb.auth.signInWithPassword({email,password:pw});
+  btn.disabled=false;
+  btn.textContent='Log in';
+  if(error){
+    // Give clear human-readable error messages
+    if(error.message==='Invalid login credentials'){
+      err.textContent='Incorrect email or password. Please try again.';
+    } else if(error.message.toLowerCase().includes('email not confirmed')){
+      err.textContent='Please confirm your email first. Check your inbox for a confirmation link.';
+    } else {
+      err.textContent=error.message;
+    }
+    return;
+  }
+  await loadUserAndGo(data.user);
+}
+
+async function doLogout(){
+  if(A.sb)await A.sb.auth.signOut();
+  A.user=null;A.profile=null;
+  A.cache={budgets:{},transactions:{}};
+  if(A.barChart){A.barChart.destroy();A.barChart=null;}
+  if(A.pieChart){A.pieChart.destroy();A.pieChart=null;}
+  showPage('pg-landing');
+}
+
+async function loadUserAndGo(user){
+  showLoad('Loading your data…');
+  A.user=user;
+  A.cache={budgets:{},transactions:{}};
+  // Get profile name
+  if(A.sb){
+    const {data}=await A.sb.from('profiles').select('full_name').eq('id',user.id).single();
+    A.profile=data;
+  }
+  hideLoad();
+  await renderDash();
+}
+
+/* ════════════════════════════════════════════
+   FORGOT PASSWORD — SUPABASE (real email)
+════════════════════════════════════════════ */
+function openForgot(){
+  document.getElementById('fp-email').value='';
+  document.getElementById('fp-err').textContent='';
+  document.getElementById('fp-ok').style.display='none';
+  document.getElementById('fp-send-btn').style.display='block';
+  // Use Supabase mode if connected, else local fallback
+  document.getElementById('fp-supabase').classList.toggle('hidden',!A.sb);
+  document.getElementById('fp-local').classList.toggle('hidden',!!A.sb);
+  if(!A.sb) resetLocalForgot();
+  document.getElementById('m-forgot').classList.remove('hidden');
+}
+
+async function fpSend(){
+  const email=document.getElementById('fp-email').value.trim();
+  const err=document.getElementById('fp-err');
+  if(!email){err.textContent='Please enter your email address.';return}
+  document.getElementById('fp-send-btn').disabled=true;
+  document.getElementById('fp-send-btn').innerHTML='<span class="spinner"></span> Sending…';
+  const {error}=await A.sb.auth.resetPasswordForEmail(email,{
+    redirectTo:window.location.href
+  });
+  document.getElementById('fp-send-btn').disabled=false;
+  document.getElementById('fp-send-btn').textContent='Send reset email';
+  if(error){err.textContent=error.message;return;}
+  err.textContent='';
+  document.getElementById('fp-ok').style.display='block';
+  document.getElementById('fp-send-btn').style.display='none';
+}
+
+/* ════════════════════════════════════════════
+   LOCAL FALLBACK (no Supabase)
+════════════════════════════════════════════ */
+function doRegisterLocal(){
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim().toLowerCase();
+  const pw=document.getElementById('reg-pw').value;
+  const pw2=document.getElementById('reg-pw2').value;
+  const err=document.getElementById('reg-err');
+  if(!name||!email||!pw||!pw2){err.textContent='All fields required.';return}
+  if(pw.length<6){err.textContent='Password must be at least 6 characters.';return}
+  if(pw!==pw2){err.textContent='Passwords do not match.';return}
+  if(localUsers[email]){err.textContent='Account already exists.';return}
+  localUsers[email]={name,email,pw:btoa(pw),resetCode:null,resetExpiry:null};
+  A.user={id:email,email};A.profile={full_name:name};
+  renderDash();
+}
+function doLoginLocal(){
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const pw=document.getElementById('login-pw').value;
+  const err=document.getElementById('login-err');
+  if(!email||!pw){err.textContent='Please enter email and password.';return}
+  const u=localUsers[email];
+  if(!u){err.textContent='No account found with this email.';return}
+  if(u.pw!==btoa(pw)){err.textContent='Incorrect password.';return}
+  A.user={id:email,email};A.profile={full_name:u.name};
+  renderDash();
+}
+function resetLocalForgot(){
+  localFP={email:null,code:null,expiry:null};
+  document.getElementById('fp-email-local').value='';
+  document.getElementById('fp-code-inp').value='';
+  document.getElementById('fp-pw1').value='';document.getElementById('fp-pw2').value='';
+  ['fp-e1','fp-e2','fp-e3'].forEach(id=>document.getElementById(id).textContent='');
+  document.getElementById('fp-ok-local').style.display='none';
+  document.getElementById('fp-save-btn').style.display='block';
+  document.getElementById('fp-s1').classList.remove('hidden');
+  document.getElementById('fp-s2').classList.add('hidden');
+  document.getElementById('fp-s3').classList.add('hidden');
+  ['fp-d1','fp-d2','fp-d3'].forEach((id,i)=>document.getElementById(id).className='step-dot'+(i===0?' active':''));
+}
+function fpNext1(){
+  const email=document.getElementById('fp-email-local').value.trim().toLowerCase();
+  const e=document.getElementById('fp-e1');
+  if(!email){e.textContent='Enter your email.';return}
+  const u=localUsers[email];
+  if(!u){e.textContent='No account found.';return}
+  const code=Math.floor(100000+Math.random()*900000).toString();
+  localFP={email,code,expiry:Date.now()+15*60*1000};
+  document.getElementById('fp-code-show').textContent=code;
+  document.getElementById('fp-s1').classList.add('hidden');
+  document.getElementById('fp-s2').classList.remove('hidden');
+  document.getElementById('fp-d1').className='step-dot done';
+  document.getElementById('fp-d2').className='step-dot active';
+}
+function fpBack1(){
+  document.getElementById('fp-s2').classList.add('hidden');
+  document.getElementById('fp-s1').classList.remove('hidden');
+  document.getElementById('fp-d1').className='step-dot active';
+  document.getElementById('fp-d2').className='step-dot';
+}
+function fpNext2(){
+  const code=document.getElementById('fp-code-inp').value.trim();
+  const e=document.getElementById('fp-e2');
+  if(!code){e.textContent='Enter the code.';return}
+  if(code!==localFP.code){e.textContent='Incorrect code.';return}
+  if(Date.now()>localFP.expiry){e.textContent='Code expired. Start over.';return}
+  document.getElementById('fp-s2').classList.add('hidden');
+  document.getElementById('fp-s3').classList.remove('hidden');
+  document.getElementById('fp-d2').className='step-dot done';
+  document.getElementById('fp-d3').className='step-dot active';
+}
+function fpNext3(){
+  const pw1=document.getElementById('fp-pw1').value;
+  const pw2=document.getElementById('fp-pw2').value;
+  const e=document.getElementById('fp-e3');
+  if(!pw1||!pw2){e.textContent='Fill in both fields.';return}
+  if(pw1.length<6){e.textContent='At least 6 characters.';return}
+  if(pw1!==pw2){e.textContent='Passwords do not match.';return}
+  const _email=localFP.email;
+  localUsers[_email].pw=btoa(pw1);
+  localFP={email:null,code:null,expiry:null};
+  document.getElementById('fp-save-btn').style.display='none';
+  document.getElementById('fp-ok-local').style.display='block';
+  document.getElementById('fp-d3').className='step-dot done';
+  setTimeout(()=>{
+    closeModal('m-forgot');
+    resetLocalForgot();
+    showAuth('login');
+    document.getElementById('login-email').value=_email;
+  },2000);
+}
+
+/* ════════════════════════════════════════════
+   DATA LAYER — SUPABASE or LOCAL CACHE
+════════════════════════════════════════════ */
+const uid=()=>A.user?.id;
+const cacheKey=(y,m)=>`${y}/${m}`;
+
+async function getBudget(y,m){
+  const k=cacheKey(y,m);
+  if(A.cache.budgets[k]!==undefined) return A.cache.budgets[k];
+  if(!A.sb||!uid()){ A.cache.budgets[k]=null; return null; }
+  const {data}=await A.sb.from('budgets').select('amount').eq('user_id',uid()).eq('year',y).eq('month',m).single();
+  A.cache.budgets[k]=data?.amount||null;
+  return A.cache.budgets[k];
+}
+
+async function saveBudgetDB(y,m,amount){
+  A.cache.budgets[cacheKey(y,m)]=amount;
+  if(!A.sb||!uid()) return;
+  await A.sb.from('budgets').upsert({user_id:uid(),year:y,month:m,amount},{onConflict:'user_id,year,month'});
+}
+
+async function getTxs(y,m){
+  const k=cacheKey(y,m);
+  if(A.cache.transactions[k]) return A.cache.transactions[k];
+  if(!A.sb||!uid()){ A.cache.transactions[k]={}; return {}; }
+  const {data}=await A.sb.from('transactions')
+    .select('*').eq('user_id',uid()).eq('year',y).eq('month',m)
+    .order('day').order('created_at');
+  const grouped={};
+  (data||[]).forEach(tx=>{
+    if(!grouped[tx.day])grouped[tx.day]=[];
+    grouped[tx.day].push({id:tx.id,amount:Number(tx.amount),cat:tx.category,desc:tx.description,time:tx.tx_time});
+  });
+  A.cache.transactions[k]=grouped;
+  return grouped;
+}
+
+async function addTxDB(y,m,day,amount,cat,desc,time){
+  A.cache.transactions[cacheKey(y,m)]=null; // invalidate cache
+  if(!A.sb||!uid()){
+    // local fallback
+    if(!A.cache.transactions[cacheKey(y,m)])A.cache.transactions[cacheKey(y,m)]={};
+    if(!A.cache.transactions[cacheKey(y,m)][day])A.cache.transactions[cacheKey(y,m)][day]=[];
+    const id='local-'+Date.now();
+    A.cache.transactions[cacheKey(y,m)][day].push({id,amount,cat,desc,time});
+    return {id};
+  }
+  const {data,error}=await A.sb.from('transactions').insert({
+    user_id:uid(),year:y,month:m,day,amount,category:cat,description:desc,tx_time:time
+  }).select().single();
+  return data;
+}
+
+async function updateTxDB(id,amount,cat,desc,time){
+  // Invalidate ALL caches
+  A.cache.transactions={};
+  if(!A.sb||!uid()||id.startsWith('local-')){
+    // handled inline for local
+    return;
+  }
+  await A.sb.from('transactions').update({amount,category:cat,description:desc,tx_time:time}).eq('id',id);
+}
+
+async function deleteTxDB(id){
+  A.cache.transactions={};
+  if(!A.sb||!uid()||id.startsWith('local-')) return;
+  await A.sb.from('transactions').delete().eq('id',id);
+}
+
+async function allMonthTotals(y){
+  // Returns {month: total} for all months in year
+  const result={};
+  if(A.sb&&uid()){
+    const {data}=await A.sb.from('transactions')
+      .select('month,amount').eq('user_id',uid()).eq('year',y);
+    (data||[]).forEach(r=>{result[r.month]=(result[r.month]||0)+Number(r.amount);});
+  }
+  return result;
+}
+
+async function allMonthBudgets(y){
+  const result={};
+  if(A.sb&&uid()){
+    const {data}=await A.sb.from('budgets')
+      .select('month,amount').eq('user_id',uid()).eq('year',y);
+    (data||[]).forEach(r=>{result[r.month]=Number(r.amount);});
+  }
+  return result;
+}
+
+/* ════════════════════════════════════════════
+   ALERT LOGIC
+════════════════════════════════════════════ */
+function curPeriod(){const d=new Date().getDate();return d<=10?1:d<=20?2:3;}
+function periodLimit(budget,p,m,y){const f=Math.floor(budget/3);return p===3?budget-f*2:f;}
+
+/*
+  SMART ALERT TIERS — percentage OVER the period's split budget limit
+  ─────────────────────────────────────────────────────────────────
+  Budget splits into 3 periods (Day 1-10, 11-20, 21-end).
+
+  Per-period tiers (% over the split limit):
+    Green (Congrats) → spent <= split limit (within or equal)
+    Orange           → spent > 112.5% of limit (over by >12.5%)
+    Yellow           → spent > 125%   of limit (over by >25%)
+    Red              → spent > 137.5% of limit (over by >37.5%)
+
+  Overall month message:
+    Appreciate → total grocery spent < total budget
+    Advise     → total grocery spent >= total budget
+*/
+function periodPct(spent,limit){
+  if(limit<=0) return 0;
+  return ((spent-limit)/limit)*100;
+}
+
+// Get ALL categories spent for a specific period
+function getPeriodSpent(txs,p,days){
+  const[s,e]=p===1?[1,10]:p===2?[11,20]:[21,days];
+  let spent=0;
+  for(let d=s;d<=e;d++)if(txs[d])txs[d].forEach(tx=>spent+=tx.amount);
+  return spent;
+}
+// Get ALL categories spent for a specific period — broken down by category
+function getPeriodCatTotals(txs,p,days){
+  const[s,e]=p===1?[1,10]:p===2?[11,20]:[21,days];
+  const cats={};
+  for(let d=s;d<=e;d++)if(txs[d])txs[d].forEach(tx=>{
+    cats[tx.cat]=(cats[tx.cat]||0)+tx.amount;
+  });
+  return cats;
+}
+
+async function getAlert(y,m){
+  const budget=await getBudget(y,m);
+  if(!budget)return{type:'info',msg:'Set your monthly grocery budget to enable smart alerts.'};
+  const txs=await getTxs(y,m);
+  const days=dim(m,y);
+  const p=curPeriod();
+  const periodLabel=p===1?'Day 1–10':p===2?'Day 11–20':('Day 21–'+days);
+  const limit=periodLimit(budget,p,m,y);
+  const spent=getPeriodSpent(txs,p,days);
+  const over=spent-limit;
+  const saved=limit-spent; // positive = saved, negative = overspent
+  const pctOver=periodPct(spent,limit);
+
+  // ── OVERALL MONTHLY check (all 3 periods combined) ──
+  let totalSpent=0;
+  Object.values(txs).forEach(day=>day.forEach(tx=>{totalSpent+=tx.amount;}));
+  const totalSaved=budget-totalSpent;
+  const isLastPeriodOver= p===3 && new Date().getDate()===days; // last day of month
+
+  // Current period alert
+  let periodAlert;
+
+  if(pctOver<=0){
+    // Spent EXACTLY at or BELOW the split limit → Congrats!
+    const savedAmt=Math.round(saved);
+    periodAlert={
+      type:'green',
+      msg:'🎉 Congrats! You spent within your '+periodLabel+' budget (₹'+Math.round(spent).toLocaleString()+' of ₹'+limit.toLocaleString()+'). You saved ₹'+savedAmt.toLocaleString()+' this period! Keep it up!',
+      pctOver,over,limit,spent,period:p,saved:savedAmt
+    };
+  } else if(pctOver<=12.5){
+    // Within the 12.5% grace zone — still green but no "congrats"
+    periodAlert={
+      type:'green',
+      msg:'✅ You are managing your '+periodLabel+' expenses well. Just ₹'+Math.round(over).toLocaleString()+' over the split limit — no worries!',
+      pctOver,over,limit,spent,period:p,saved:0
+    };
+  } else if(pctOver<=25){
+    periodAlert={
+      type:'orange',
+      msg:'⚠️ Orange Alert! You\'ve spent '+pctOver.toFixed(1)+'% over your '+periodLabel+' limit (₹'+Math.round(over).toLocaleString()+' extra). Please monitor your spending carefully.',
+      pctOver,over,limit,spent,period:p,saved:0
+    };
+  } else if(pctOver<=37.5){
+    periodAlert={
+      type:'yellow',
+      msg:'🟡 Yellow Alert! You\'ve spent '+pctOver.toFixed(1)+'% over your '+periodLabel+' limit (₹'+Math.round(over).toLocaleString()+' extra). Please slow down and avoid unnecessary purchases.',
+      pctOver,over,limit,spent,period:p,saved:0
+    };
+  } else {
+    periodAlert={
+      type:'red',
+      msg:'🚨 Red Alert! You\'ve spent '+pctOver.toFixed(1)+'% over your '+periodLabel+' limit (₹'+Math.round(over).toLocaleString()+' extra). Reduce expenses immediately to stay within budget.',
+      pctOver,over,limit,spent,period:p,saved:0
+    };
+  }
+
+  // ── OVERALL MONTHLY message (shown as second line in alert) ──
+  let overallMsg='';
+  if(totalSpent>0){
+    if(totalSaved>=0){
+      overallMsg=' | 🏆 Monthly: You\'ve saved ₹'+Math.round(totalSaved).toLocaleString()+' overall — amazing financial discipline!';
+    } else {
+      overallMsg=' | 📌 Monthly: Total spend ₹'+Math.round(totalSpent).toLocaleString()+' is ₹'+Math.round(-totalSaved).toLocaleString()+' over your budget. Plan better next month!';
+    }
+  }
+  periodAlert.msg += overallMsg;
+  periodAlert.overallSaved=totalSaved;
+
+  return periodAlert;
+}
+
+/* ════════════════════════════════════════════
+   DASHBOARD
+════════════════════════════════════════════ */
+async function renderDash(){
+  showPage('pg-dashboard');
+  const now=new Date();
+  const y=A.currentYear;
+  const m=now.getMonth(); // current month
+  const name=A.profile?.full_name||A.user?.email||'User';
+  document.getElementById('dash-name').textContent=name;
+  document.getElementById('dash-yr').textContent=y+' 📅';
+  document.getElementById('yr-display').textContent=y;
+  document.getElementById('dash-month-lbl').textContent='Summary for '+MN[m]+' '+y;
+  
+  showLoad('Loading dashboard…');
+  
+  try {
+    // 1. Fetch all data for the year and current month in parallel
+    const [txsRes, budgetsRes, currTxs] = await Promise.all([
+      A.sb ? A.sb.from('transactions').select('month,category,amount').eq('user_id',uid()).eq('year',y) : Promise.resolve({data:[]}),
+      A.sb ? A.sb.from('budgets').select('month,amount').eq('user_id',uid()).eq('year',y) : Promise.resolve({data:[]}),
+      getTxs(y, m) // gets and caches current month transactions
+    ]);
+
+    const yearTxs = txsRes.data || [];
+    const yearBudgets = budgetsRes.data || [];
+
+    // 2. Process data in JavaScript
+    const totals = {};
+    const budgets = {};
+    const catData = {};
+    CATS.forEach(c => catData[c] = 0);
+
+    yearTxs.forEach(t => {
+      totals[t.month] = (totals[t.month] || 0) + Number(t.amount);
+      catData[t.category] = (catData[t.category] || 0) + Number(t.amount);
+    });
+
+    yearBudgets.forEach(b => {
+      budgets[b.month] = Number(b.amount);
+      A.cache.budgets[cacheKey(y, b.month)] = Number(b.amount);
+    });
+
+    // Fill missing months in budget cache to prevent database requests on cache misses
+    for (let i = 0; i < 12; i++) {
+      const k = cacheKey(y, i);
+      if (A.cache.budgets[k] === undefined) {
+        A.cache.budgets[k] = null;
+      }
+    }
+
+    // 3. Render dashboard components synchronously using processed data
+    await renderSummaryCards(y, m);
+    renderMonthsGridFromData(totals, budgets);
+    renderChartsFromData(totals, budgets, catData);
+  } catch (e) {
+    console.error('Failed to render dashboard:', e);
+  } finally {
+    hideLoad();
+  }
+}
+
+async function renderSummaryCards(y,m){
+  const budget=await getBudget(y,m);
+  const txs=await getTxs(y,m);
+  let gs=0, total=0;
+  Object.values(txs).forEach(day=>day.forEach(tx=>{
+    total+=tx.amount;
+    if(tx.cat==='Grocery')gs+=tx.amount;
+  }));
+  document.getElementById('dash-budget-prompt').classList.toggle('hidden',!!budget);
+  let html='';
+  if(!budget){
+    html=`<div class="metric"><div class="metric-label">Monthly budget</div><div class="metric-val" style="color:#F59E0B;font-size:16px">Not set</div><div class="metric-sub">Tap "Set monthly budget"</div></div>
+    <div class="metric"><div class="metric-label">Total spent</div><div class="metric-val">₹${Math.round(total).toLocaleString()}</div><div class="metric-sub">All categories</div></div>
+    <div class="metric"><div class="metric-label">Remaining</div><div class="metric-val" style="color:#888780">—</div><div class="metric-sub">Set budget first</div></div>
+    <div class="metric"><div class="metric-label">Utilization</div><div class="metric-val" style="color:#888780">—</div></div>`;
+  } else {
+    const rem=budget-total,pct=Math.min(100,Math.round(total/budget*100));
+    const bar=pct>80?'#e34948':pct>60?'#eda100':'#1baf7a';
+    html=`<div class="metric"><div class="metric-label">Monthly budget</div><div class="metric-val">₹${budget.toLocaleString()}</div><div class="metric-sub">Your limit</div></div>
+    <div class="metric"><div class="metric-label">Total spent</div><div class="metric-val">₹${Math.round(total).toLocaleString()}</div><div class="metric-sub">All categories</div></div>
+    <div class="metric"><div class="metric-label">Remaining</div><div class="metric-val" style="color:${rem>=0?'#1baf7a':'#e34948'}">₹${Math.abs(Math.round(rem)).toLocaleString()}</div><div class="metric-sub">${rem>=0?'Left to spend':'Over budget'}</div></div>
+    <div class="metric"><div class="metric-label">Utilization</div><div class="metric-val">${pct}%</div><div class="prog-wrap"><div class="prog-bar" style="width:${pct}%;background:${bar}"></div></div></div>`;
+  }
+  document.getElementById('dash-cards').innerHTML=html;
+  const al=await getAlert(y,m);
+  document.getElementById('dash-alert').innerHTML=`<div class="alert alert-${al.type}">${alertIcon[al.type]} ${al.msg}</div>`;
+}
+
+function renderMonthsGridFromData(totals, budgets){
+  const grid=document.getElementById('months-grid');
+  grid.innerHTML='';
+  MN.forEach((name,i)=>{
+    const total=totals[i]||0,budget=budgets[i]||null;
+    const el=document.createElement('div');el.className='month-card';
+    el.innerHTML=`<div style="font-size:22px;margin-bottom:4px">${MI[i]}</div>
+    <div style="font-size:13px;font-weight:700;color:#1a1a18">${name}</div>
+    ${total>0?`<div style="font-size:12px;color:#2a78d6;margin-top:4px;font-weight:700">₹${Math.round(total).toLocaleString()}</div>`:''}
+    <div style="font-size:11px;color:${budget?'#888780':'#F59E0B'};margin-top:3px">${budget?'Budget ₹'+budget.toLocaleString():'No budget set'}</div>
+    <div style="margin-top:6px;font-size:11px;color:#2a78d6;font-weight:600">View →</div>`;
+    el.onclick=()=>openMonth(A.currentYear,i);
+    grid.appendChild(el);
+  });
+}
+
+function changeYear(d){
+  A.currentYear+=d;
+  renderDash();
+}
+
+function renderChartsFromData(totals, budgets, catData){
+  if(A.barChart)A.barChart.destroy();
+  A.barChart=new Chart(document.getElementById('chart-bar'),{
+    type:'bar',
+    data:{labels:MN.map(m=>m.slice(0,3)),datasets:[
+      {label:'Budget',data:MN.map((_,i)=>budgets[i]||0),backgroundColor:'#B5D4F4',borderWidth:0,borderRadius:4},
+      {label:'Spent',data:MN.map((_,i)=>Math.round(totals[i]||0)),backgroundColor:'#2a78d6',borderWidth:0,borderRadius:4}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v},grid:{color:'rgba(0,0,0,0.04)'}}}}
+  });
+  if(A.pieChart)A.pieChart.destroy();
+  const pd=CATS.map(c=>Math.round(catData[c]));
+  const hasData=pd.some(v=>v>0);
+  A.pieChart=new Chart(document.getElementById('chart-pie'),{
+    type:'doughnut',
+    data:{labels:CATS,datasets:[{data:hasData?pd:[1],backgroundColor:hasData?CATS.map(c=>CC[c]):['#e8e6de'],borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+  });
+}
+
+/* ════════════════════════════════════════════
+   EMAIL NOTIFICATIONS — sends alert to user's email
+   via Supabase Edge Function whenever the alert tier
+   escalates (green→orange→yellow→red) for a period.
+════════════════════════════════════════════ */
+async function checkAndNotifyAlert(y,m){
+  if(!A.sb||!uid())return;
+  const al = await getAlert(y,m);
+  // Send email for orange, yellow AND red (all 3 alert tiers)
+  // Skip only green (within budget) and info (no budget set yet)
+  if(al.type==='info'||al.type==='green')return;
+
+  // Track last-notified tier per user/year/month/period in localStorage
+  // to avoid spamming — only send when tier ESCALATES (orange→yellow→red)
+  // orange=1, yellow=2, red=3
+  const tierRank={orange:1,yellow:2,red:3};
+  const notifyKey = 'alertNotified_'+uid()+'_'+y+'_'+m+'_'+al.period;
+  const lastTier = localStorage.getItem(notifyKey);
+  const lastRank = lastTier ? tierRank[lastTier] : 0;
+  const curRank  = tierRank[al.type];
+
+  // Only send when escalating to a NEW higher tier
+  // (prevents same-tier email spam on every transaction)
+  if(curRank<=lastRank) return;
+
+  localStorage.setItem(notifyKey, al.type);
+
+  // Log the alert to the database (audit trail), then attempt to email it
+  try{
+    await A.sb.from('alert_logs').insert({
+      user_id: uid(),
+      year: y, month: m, period: al.period,
+      alert_type: al.type,
+      message: al.msg,
+      email_sent_to: A.user.email
+    });
+  }catch(e){
+    console.warn('Alert log insert failed (non-blocking):',e);
+  }
+
+  // Build tier-specific subject prefix
+  const tierPrefix = al.type==='orange'
+    ? '⚠️ Orange Alert'
+    : al.type==='yellow'
+    ? '🟡 Yellow Alert'
+    : '🚨 Red Alert';
+
+  try{
+    await A.sb.functions.invoke('send-budget-alert',{
+      body:{
+        to: A.user.email,
+        name: A.profile?.full_name || A.user.email,
+        alertType: al.type,
+        tierPrefix,
+        message: al.msg,
+        month: MN[m],
+        year: y,
+        period: al.period,
+        periodLabel: al.period===1?'Day 1–10':al.period===2?'Day 11–20':'Day 21–'+dim(m,y),
+        spent: Math.round(al.spent),
+        limit: Math.round(al.limit),
+        over: Math.round(al.over),
+        pctOver: al.pctOver.toFixed(1)
+      }
+    });
+    console.log('Alert email sent:',al.type,'for period',al.period);
+  }catch(e){
+    // Edge Function may not be deployed yet — alerts still work inside the app
+    console.warn('Email notification (non-blocking):',e.message);
+  }
+}
+
+/* ════════════════════════════════════════════
+   DASHBOARD
+════════════════════════════════════════════ */
+
+
+/* ════════════════════════════════════════════
+   BUDGET MODAL
+════════════════════════════════════════════ */
+async function openBudgetModal(y,m){
+  const now=new Date();
+  A.budgetTarget={y:y??now.getFullYear(),m:m??now.getMonth()};
+  document.getElementById('budget-modal-title').textContent='Budget — '+MN[A.budgetTarget.m]+' '+A.budgetTarget.y;
+  const existing=await getBudget(A.budgetTarget.y,A.budgetTarget.m);
+  document.getElementById('budget-inp').value=existing||'';
+  document.getElementById('budget-err').textContent='';
+  document.getElementById('budget-preview').style.display=existing?'block':'none';
+  if(existing)_renderSplitPreview(existing);
+  document.getElementById('m-budget').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('budget-inp').focus(),80);
+}
+function updateBudgetPreview(){
+  const v=parseFloat(document.getElementById('budget-inp').value);
+  if(!v||v<=0){document.getElementById('budget-preview').style.display='none';return;}
+  document.getElementById('budget-preview').style.display='block';
+  _renderSplitPreview(v);
+}
+function _renderSplitPreview(v){
+  const f=Math.floor(v/3),p3=v-f*2;
+  document.getElementById('split-cards').innerHTML=`
+  <div class="split-card"><div class="split-lbl">Day 1–10</div><div class="split-val">₹${f.toLocaleString()}</div></div>
+  <div class="split-card"><div class="split-lbl">Day 11–20</div><div class="split-val">₹${f.toLocaleString()}</div></div>
+  <div class="split-card"><div class="split-lbl">Day 21–end</div><div class="split-val">₹${p3.toLocaleString()}</div></div>`;
+}
+async function saveBudget(){
+  const v=parseFloat(document.getElementById('budget-inp').value);
+  const err=document.getElementById('budget-err');
+  if(!v||v<=0||isNaN(v)){err.textContent='Enter a valid amount greater than ₹0.';return;}
+  const btn=document.getElementById('budget-save-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
+  const{y,m}=A.budgetTarget;
+  await saveBudgetDB(y,m,v);
+  btn.disabled=false;btn.textContent='Save budget';
+  closeModal('m-budget');
+  if(document.getElementById('pg-dashboard').classList.contains('active')){
+    await renderDash();
+  }
+  if(document.getElementById('pg-month').classList.contains('active')){
+    document.getElementById('month-budget-tag').textContent='Budget ₹'+v.toLocaleString();
+    document.getElementById('month-budget-prompt').classList.add('hidden');
+    await renderMonthSummary();
+  }
+  // Reset notification memory for this month — new budget means new limits to evaluate
+  ['1','2','3'].forEach(p=>localStorage.removeItem('alertNotified_'+uid()+'_'+y+'_'+m+'_'+p));
+  checkAndNotifyAlert(y,m);
+}
+
+/* ════════════════════════════════════════════
+   MONTH PAGE
+════════════════════════════════════════════ */
+async function openMonth(y,m){
+  A.currentYear=y;A.currentMonth=m;
+  document.getElementById('month-title').textContent=MN[m]+' '+y;
+  document.getElementById('month-sub').textContent=dim(m,y)+' days';
+  document.getElementById('search-inp').value='';
+  document.getElementById('filter-cat').value='';
+  showLoad('Loading '+MN[m]+'…');
+  const budget=await getBudget(y,m);
+  document.getElementById('month-budget-tag').textContent=budget?'Budget ₹'+budget.toLocaleString():'No budget set';
+  document.getElementById('month-budget-prompt').classList.toggle('hidden',!!budget);
+  await renderMonthSummary();
+  await renderDates();
+  hideLoad();
+  showPage('pg-month');
+}
+
+async function renderMonthSummary(){
+  const y=A.currentYear,m=A.currentMonth;
+  const budget=await getBudget(y,m);
+  const txs=await getTxs(y,m);
+  const days=dim(m,y);
+  let gs=0,total=0;
+  const allCatTotals={};
+  Object.values(txs).forEach(day=>day.forEach(tx=>{
+    total+=tx.amount;
+    if(tx.cat==='Grocery')gs+=tx.amount;
+    allCatTotals[tx.cat]=(allCatTotals[tx.cat]||0)+tx.amount;
+  }));
+  // Remaining = budget minus ALL categories spent (not just grocery)
+  const rem=budget?(budget-total):null;
+
+  // ── Summary metric cards ──
+  // Category stacks — show top spending categories as color bars
+  const catEntries=Object.entries(allCatTotals).sort((a,b)=>b[1]-a[1]);
+  const catStackHTML=total>0?catEntries.map(([cat,amt])=>{
+    const pct=Math.min(100,(amt/total)*100);
+    return `<div title="${cat}: ₹${Math.round(amt).toLocaleString()}" style="height:6px;background:${CC[cat]||'#888'};width:${pct}%;border-radius:3px;min-width:4px;flex-shrink:0"></div>`;
+  }).join(''):'';
+
+  document.getElementById('month-cards').innerHTML=`
+  <div class="metric">
+    <div class="metric-label">Monthly budget</div>
+    <div class="metric-val" style="${!budget?'color:#F59E0B;font-size:16px':''}">${budget?'₹'+budget.toLocaleString():'Not set'}</div>
+    <div class="metric-sub">Grocery limit</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Grocery spent</div>
+    <div class="metric-val">₹${Math.round(gs).toLocaleString()}</div>
+    <div class="metric-sub" style="color:${budget&&gs>budget?'#e34948':'#888780'}">${budget?Math.min(100,Math.round(gs/budget*100))+'% of limit':''}</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">All categories</div>
+    <div class="metric-val">₹${Math.round(total).toLocaleString()}</div>
+    ${total>0?`<div style="display:flex;gap:3px;margin-top:6px;flex-wrap:wrap">${catStackHTML}</div>`:'<div class="metric-sub">No spending yet</div>'}
+  </div>
+  <div class="metric">
+    <div class="metric-label">Remaining</div>
+    <div class="metric-val" style="color:${rem===null?'#888780':rem>=0?'#1baf7a':'#e34948'}">${rem===null?'—':'₹'+Math.abs(Math.round(rem)).toLocaleString()}</div>
+    <div class="metric-sub">${rem===null?'Set budget':rem>=0?'Left (all categories)':'Over budget'}</div>
+  </div>`;
+
+  document.getElementById('month-total').textContent='₹'+Math.round(total).toLocaleString();
+
+  // ── Per-period savings/overspend rows (all 3 periods) ──
+  if(budget){
+    const periodDefs=[
+      {p:1,label:'Period 1',days:'Day 1–10'},
+      {p:2,label:'Period 2',days:'Day 11–20'},
+      {p:3,label:'Period 3',days:'Day 21–'+days}
+    ];
+
+    let periodsHTML='<div style="margin:14px 0 6px">';
+    periodsHTML+='<div style="font-size:12px;font-weight:700;color:#5f5e5a;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Period Breakdown</div>';
+
+    for(const {p,label,days:dlabel} of periodDefs){
+      const limit=periodLimit(budget,p,m,y);
+      const spent=getPeriodSpent(txs,p,days);         // ALL categories
+      const catBreakdown=getPeriodCatTotals(txs,p,days); // per-cat breakdown
+      const saved=limit-spent;
+      const pctOver=periodPct(spent,limit);
+      let bgColor,textColor,borderColor,icon,statusMsg;
+
+      if(pctOver<=0){
+        bgColor='#E1F5EE';textColor='#0F6E56';borderColor='#9FE1CB';
+        icon='🎉';
+        statusMsg='Congrats! You spent ₹'+Math.round(spent).toLocaleString()+' of ₹'+limit.toLocaleString()+'. You saved ₹'+Math.round(saved).toLocaleString()+'!';
+      } else if(pctOver<=12.5){
+        bgColor='#E1F5EE';textColor='#0F6E56';borderColor='#9FE1CB';
+        icon='✅';
+        statusMsg='Good! ₹'+Math.round(spent).toLocaleString()+' spent. Just ₹'+Math.round(-saved).toLocaleString()+' over — within safe zone.';
+      } else if(pctOver<=25){
+        bgColor='#FFEFD9';textColor='#9A5B0A';borderColor='#FFCC80';
+        icon='⚠️';
+        statusMsg='Watch out! ₹'+Math.round(spent).toLocaleString()+' spent. ₹'+Math.round(-saved).toLocaleString()+' over limit. Reduce spending.';
+      } else if(pctOver<=37.5){
+        bgColor='#FEF9C3';textColor='#854D0E';borderColor='#FDE047';
+        icon='🟡';
+        statusMsg='Caution! ₹'+Math.round(spent).toLocaleString()+' spent. ₹'+Math.round(-saved).toLocaleString()+' over limit. Please slow down.';
+      } else {
+        bgColor='#FCEBEB';textColor='#A32D2D';borderColor='#F7C1C1';
+        icon='🚨';
+        statusMsg='Over budget! ₹'+Math.round(spent).toLocaleString()+' spent. ₹'+Math.round(-saved).toLocaleString()+' over limit. Cut expenses now!';
+      }
+
+      // Build category tags for this period
+      const catTagsHTML=Object.entries(catBreakdown)
+        .sort((a,b)=>b[1]-a[1])
+        .map(([cat,amt])=>`
+          <span style="display:inline-flex;align-items:center;gap:4px;background:${CC[cat]||'#888'}22;color:${CC[cat]||'#888'};border:1px solid ${CC[cat]||'#888'}44;border-radius:20px;padding:3px 9px;font-size:11px;font-weight:600;white-space:nowrap">
+            <span style="width:7px;height:7px;border-radius:50%;background:${CC[cat]||'#888'};flex-shrink:0"></span>
+            ${cat} ₹${Math.round(amt).toLocaleString()}
+          </span>`).join('');
+
+      periodsHTML+=`
+      <div style="background:${bgColor};border:1px solid ${borderColor};border-radius:12px;padding:12px 14px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:${textColor}">${icon} ${label} (${dlabel})</div>
+            <div style="font-size:13px;color:${textColor};margin-top:3px;line-height:1.5">${statusMsg}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:10px;color:${textColor};opacity:.7;font-weight:600;text-transform:uppercase;letter-spacing:.04em">Limit</div>
+            <div style="font-size:17px;font-weight:700;color:${textColor}">₹${limit.toLocaleString()}</div>
+          </div>
+        </div>
+        ${catTagsHTML?`<div style="display:flex;flex-wrap:wrap;gap:5px;padding-top:8px;border-top:1px solid ${borderColor}">${catTagsHTML}</div>`:''}
+      </div>`;
+    }
+
+    // ── Overall monthly appreciation or advice (based on ALL categories) ──
+    const overallSaved=budget-total;
+    let overallBg,overallColor,overallBorder,overallIcon,overallMsg;
+    if(overallSaved>=0){
+      overallBg='#E1F5EE';overallColor='#0F6E56';overallBorder='#9FE1CB';
+      overallIcon='🏆';
+      overallMsg='Amazing! Overall this month you spent ₹'+Math.round(total).toLocaleString()+' (all categories) and saved ₹'+Math.round(overallSaved).toLocaleString()+' from your ₹'+budget.toLocaleString()+' budget. Excellent financial discipline!';
+    } else {
+      overallBg='#FCEBEB';overallColor='#A32D2D';overallBorder='#F7C1C1';
+      overallIcon='📌';
+      overallMsg='This month your total spending (₹'+Math.round(total).toLocaleString()+' across all categories) exceeded your budget by ₹'+Math.round(-overallSaved).toLocaleString()+'. Plan better next month — you can do it!';
+    }
+
+    periodsHTML+=`
+    <div style="background:${overallBg};border:1.5px solid ${overallBorder};border-radius:10px;padding:12px 14px;margin-top:4px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:22px">${overallIcon}</span>
+      <div style="font-size:13px;font-weight:600;color:${overallColor}">${overallMsg}</div>
+    </div>`;
+
+    periodsHTML+='</div>';
+
+    // Insert period breakdown after month-alert
+    const alertEl=document.getElementById('month-alert');
+    // Remove old period breakdown if exists
+    const oldBreakdown=document.getElementById('period-breakdown');
+    if(oldBreakdown)oldBreakdown.remove();
+    const breakDiv=document.createElement('div');
+    breakDiv.id='period-breakdown';
+    breakDiv.innerHTML=periodsHTML;
+    alertEl.after(breakDiv);
+  } else {
+    const oldBreakdown=document.getElementById('period-breakdown');
+    if(oldBreakdown)oldBreakdown.remove();
+  }
+
+  const al=await getAlert(y,m);
+  document.getElementById('month-alert').innerHTML=`<div class="alert alert-${al.type}">${alertIcon[al.type]} ${al.msg}</div>`;
+}
+
+async function renderDates(){
+  const y=A.currentYear,m=A.currentMonth,days=dim(m,y);
+  const txs=await getTxs(y,m);
+  const search=document.getElementById('search-inp').value.toLowerCase();
+  const fc=document.getElementById('filter-cat').value;
+  const wrap=document.getElementById('dates-wrap');wrap.innerHTML='';
+  let monthTotal=0;
+
+  for(let d=1;d<=days;d++){
+    const raw=txs[d]||[];
+    const filtered=raw.filter(t=>(!search||(t.desc&&t.desc.toLowerCase().includes(search))||(t.cat&&t.cat.toLowerCase().includes(search)))&&(!fc||t.cat===fc));
+    const dayTotal=raw.reduce((a,t)=>a+t.amount,0);
+    monthTotal+=dayTotal;
+    const dow=new Date(y,m,d).toLocaleDateString('en-IN',{weekday:'short'});
+    const block=document.createElement('div');block.className='date-block';
+    const txHTML=filtered.length===0&&(search||fc)?
+      '<p style="text-align:center;padding:16px;color:#888780;font-size:13px">No matching transactions</p>':
+      filtered.map(t=>`<div class="tx-row">
+        <span class="cat-badge" style="background:${CC[t.cat]}22;color:${CC[t.cat]}">${t.cat}</span>
+        <span style="flex:1;font-size:13px;color:#1a1a18">${t.desc||'No description'}</span>
+        <span style="font-size:12px;color:#888780">${t.time||''}</span>
+        <span style="font-weight:700;font-size:14px;white-space:nowrap">₹${Math.round(t.amount).toLocaleString()}</span>
+        <button class="btn btn-sm" onclick="openEditTx(${d},'${t.id}')" style="padding:3px 8px;font-size:11px" title="Edit"><i class="ti ti-edit"></i></button>
+        <button class="btn btn-danger" onclick="doDeleteTx(${d},'${t.id}')" title="Delete"><i class="ti ti-trash"></i></button>
+      </div>`).join('');
+    block.innerHTML=`
+    <div class="date-hdr" onclick="toggleDate(this)" id="hdr-${d}">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:15px;font-weight:700">${d} ${MN[m].slice(0,3)}</span>
+        <span style="font-size:12px;color:#888780">${dow}</span>
+        ${raw.length>0
+          ? `<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:#E1F5EE;color:#0F6E56;font-weight:600">${raw.length} tx</span>`
+          : `<span style="font-size:11px;color:#b4b2a9;font-style:italic">tap to add</span>`
+        }
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        ${dayTotal>0?`<span style="font-size:14px;font-weight:700;color:#2a78d6">₹${Math.round(dayTotal).toLocaleString()}</span>`:''}
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openAddTx(${d})" style="border-radius:20px;padding:4px 12px">+ Add</button>
+        <i class="ti ti-chevron-down" id="chev-${d}" style="color:#888780;font-size:14px;transition:transform .2s"></i>
+      </div>
+    </div>
+    <div class="date-body" id="body-${d}" style="display:none">
+      ${txHTML}
+      ${raw.length>0?`<div style="text-align:right;font-size:13px;color:#5f5e5a;padding-top:8px;border-top:1px solid rgba(0,0,0,.07);margin-top:6px">Daily total: <strong style="color:#1a1a18">₹${Math.round(dayTotal).toLocaleString()}</strong></div>`:''}
+    </div>`;
+    wrap.appendChild(block);
+  }
+
+  // ── MONTHLY TOTAL CARD — bottom right after last date ──
+  const cats=await getTxs(y,m); // already fetched, reuse
+  // Count transactions
+  let txCount=0;
+  let daysWithSpend=0;
+  Object.values(await getTxs(y,m)).forEach(day=>{
+    if(day.length>0){daysWithSpend++;txCount+=day.length;}
+  });
+  const avgPerDay = daysWithSpend>0 ? Math.round(monthTotal/daysWithSpend) : 0;
+
+  const totalCard=document.createElement('div');
+  totalCard.style.cssText='margin-top:20px;margin-bottom:24px;';
+  totalCard.innerHTML=`
+    <div style="border-top:2px dashed rgba(42,120,214,.25);padding-top:20px;display:flex;justify-content:flex-end">
+      <div style="background:linear-gradient(135deg,#1a2744 0%,#1e3a6e 100%);border-radius:16px;padding:20px 28px;border:1px solid rgba(91,141,238,.3);box-shadow:0 6px 24px rgba(0,0,0,.18);min-width:260px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)">
+          <span style="font-size:18px">📊</span>
+          <span style="font-size:12px;color:#7a8bbf;font-weight:700;text-transform:uppercase;letter-spacing:.08em">${MN[A.currentMonth]} ${A.currentYear} Summary</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end">
+          <div>
+            <div style="font-size:11px;color:#7a8bbf;margin-bottom:4px;font-weight:600">MONTHLY TOTAL</div>
+            <div style="font-size:32px;font-weight:700;color:#e8f0fe;line-height:1">₹${Math.round(monthTotal).toLocaleString()}</div>
+            <div style="font-size:11px;color:#5b8dee;margin-top:6px">${txCount} transactions · ${daysWithSpend} days spent</div>
+          </div>
+          ${avgPerDay>0?`
+          <div style="text-align:right">
+            <div style="font-size:10px;color:#7a8bbf;margin-bottom:3px;font-weight:600">AVG/DAY</div>
+            <div style="font-size:18px;font-weight:700;color:#5b8dee">₹${avgPerDay.toLocaleString()}</div>
+          </div>`:''}
+        </div>
+      </div>
+    </div>`;
+  wrap.appendChild(totalCard);
+}
+
+function toggleDate(h){
+  const b=h.nextElementSibling;
+  const isOpen=b.style.display==='block';
+  b.style.display=isOpen?'none':'block';
+  // Rotate chevron icon
+  const chev=h.querySelector('.ti-chevron-down');
+  if(chev) chev.style.transform=isOpen?'rotate(0deg)':'rotate(180deg)';
+}
+
+/* ════════════════════════════════════════════
+   TRANSACTION MODAL
+════════════════════════════════════════════ */
+function openAddTx(day){
+  A.editTxId=null;A.editDay=day;
+  document.getElementById('tx-title').textContent='Add — '+day+' '+MN[A.currentMonth].slice(0,3)+' '+A.currentYear;
+  document.getElementById('tx-amt').value='';
+  document.getElementById('tx-desc').value='';
+  document.getElementById('tx-amt-err').textContent='';
+  const now=new Date();
+  document.getElementById('tx-time').value=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  A.selCat='Grocery';renderPills('Grocery');
+  document.getElementById('m-tx').classList.remove('hidden');
+  // Reset calculator when modal opens
+  calcClear();
+  document.getElementById('calc-panel').classList.remove('open');
+  document.getElementById('calc-toggle-btn').style.background='';
+  document.getElementById('calc-toggle-btn').style.borderColor='';
+  setTimeout(()=>document.getElementById('tx-amt').focus(),80);
+}
+
+async function openEditTx(day,txId){
+  const txs=await getTxs(A.currentYear,A.currentMonth);
+  const t=txs[day]?.find(tx=>tx.id===txId);
+  if(!t)return;
+  A.editTxId=txId;A.editDay=day;
+  document.getElementById('tx-title').textContent='Edit — '+day+' '+MN[A.currentMonth].slice(0,3)+' '+A.currentYear;
+  document.getElementById('tx-amt').value=t.amount;
+  document.getElementById('tx-desc').value=t.desc||'';
+  document.getElementById('tx-time').value=t.time||'12:00';
+  document.getElementById('tx-amt-err').textContent='';
+  A.selCat=t.cat||'Grocery';renderPills(A.selCat);
+  document.getElementById('m-tx').classList.remove('hidden');
+}
+
+function renderPills(sel){
+  document.getElementById('cat-pills').innerHTML=CATS.map(c=>`<div class="cat-pill${c===sel?' sel':''}" style="${c===sel?'background:'+CC[c]+';border-color:'+CC[c]+';':''}" onclick="selCat('${c}')">${c}</div>`).join('');
+}
+function selCat(c){A.selCat=c;renderPills(c);}
+
+async function saveTx(){
+  const amt=parseFloat(document.getElementById('tx-amt').value);
+  const errEl=document.getElementById('tx-amt-err');
+  if(!amt||amt<=0||isNaN(amt)){errEl.textContent='Enter a valid amount greater than ₹0.';document.getElementById('tx-amt').focus();return;}
+  errEl.textContent='';
+  const btn=document.getElementById('tx-save-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
+  const day=A.editDay,desc=document.getElementById('tx-desc').value.trim(),time=document.getElementById('tx-time').value;
+  if(A.editTxId){
+    // Edit existing
+    const txs=A.cache.transactions[cacheKey(A.currentYear,A.currentMonth)];
+    if(txs&&txs[day]){
+      const t=txs[day].find(x=>x.id===A.editTxId);
+      if(t){t.amount=amt;t.cat=A.selCat;t.desc=desc;t.time=time;}
+    }
+    await updateTxDB(A.editTxId,amt,A.selCat,desc,time);
+    // Re-fetch
+    A.cache.transactions[cacheKey(A.currentYear,A.currentMonth)]=null;
+  } else {
+    await addTxDB(A.currentYear,A.currentMonth,day,amt,A.selCat,desc,time);
+  }
+  // Reload txs
+  A.cache.transactions[cacheKey(A.currentYear,A.currentMonth)]=null;
+  btn.disabled=false;btn.textContent='Save transaction';
+  closeModal('m-tx');
+  await renderDates();
+  await renderMonthSummary();
+  // Check if this transaction pushed the user into a new alert tier — send email if so
+  checkAndNotifyAlert(A.currentYear,A.currentMonth);
+}
+
+async function doDeleteTx(day,txId){
+  if(!confirm('Delete this transaction?'))return;
+  // Remove from local cache
+  const k=cacheKey(A.currentYear,A.currentMonth);
+  if(A.cache.transactions[k]&&A.cache.transactions[k][day]){
+    A.cache.transactions[k][day]=A.cache.transactions[k][day].filter(t=>t.id!==txId);
+  }
+  await deleteTxDB(txId);
+  A.cache.transactions[k]=null; // force re-fetch
+  await renderDates();
+  await renderMonthSummary();
+}
+
+/* ════════════════════════════════════════════
+   CALENDAR MODAL
+════════════════════════════════════════════ */
+function openCal(){
+  document.getElementById('cal-body').innerHTML=`
+  <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px">
+    <button class="year-btn" onclick="calY(-1)">‹</button>
+    <span id="cal-yr" style="font-size:18px;font-weight:700;min-width:60px;text-align:center">${A.currentYear}</span>
+    <button class="year-btn" onclick="calY(1)">›</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px" id="cal-grid"></div>`;
+  renderCalGrid();
+  document.getElementById('m-cal').classList.remove('hidden');
+}
+function renderCalGrid(){
+  document.getElementById('cal-grid').innerHTML=MN.map((n,i)=>`
+  <div onclick="closeModal('m-cal');openMonth(${A.currentYear},${i})"
+    style="padding:10px 6px;border-radius:10px;border:1px solid rgba(0,0,0,.09);cursor:pointer;text-align:center;transition:all .12s"
+    onmouseover="this.style.background='#E6F1FB';this.style.borderColor='#2a78d6'"
+    onmouseout="this.style.background='';this.style.borderColor='rgba(0,0,0,.09)'">
+    <div style="font-size:16px">${MI[i]}</div>
+    <div style="font-size:12px;font-weight:700;margin-top:3px;color:#1a1a18">${n.slice(0,3)}</div>
+  </div>`).join('');
+}
+function calY(d){
+  A.currentYear+=d;
+  document.getElementById('cal-yr').textContent=A.currentYear;
+  document.getElementById('yr-display').textContent=A.currentYear;
+  renderCalGrid();renderMonthsGrid();
+}
+
+/* ════════════════════════════════════════════
+   CSV EXPORT
+════════════════════════════════════════════ */
+async function exportCSV(){
+  const y=A.currentYear,m=A.currentMonth;
+  const txs=await getTxs(y,m);
+  const rows=[['Date','Amount (₹)','Category','Description','Time']];
+  Object.keys(txs).sort((a,b)=>+a-+b).forEach(d=>{
+    txs[d].forEach(t=>rows.push([d+' '+MN[m].slice(0,3)+' '+y,t.amount,t.cat,t.desc||'',t.time||'']));
+  });
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='budget-'+MN[m]+'-'+y+'.csv';a.click();
+}
+
+/* ════════════════════════════════════════════
+   STARTUP
+════════════════════════════════════════════ */
+// ── SUPABASE CREDENTIALS — HARDCODED ──
+// Every device connects automatically. No setup needed.
+// Users just open the app and sign in directly.
+const SUPABASE_URL = 'https://ywkqegaparzgvthaomjr.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3a3FlZ2FwYXJ6Z3Z0aGFvbWpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1OTI4NDMsImV4cCI6MjA5ODE2ODg0M30.lqtESeWacDuWS-zXRh83DaP9SnjaugoNbhRRsOLobM0';
+
+async function startup(){
+  showLoad('Connecting to database…');
+  // Always connect using hardcoded credentials — works on every device automatically
+  const ok = initSupabase(SUPABASE_URL, SUPABASE_KEY);
+  if(ok){
+    document.getElementById('sb-status-tag').innerHTML='<span class="connected-badge">🟢 Supabase Connected</span>';
+    document.getElementById('auth-sb-tag').style.display='';
+    try{
+      // Check if user is already logged in on this device
+      const {data:{session}} = await A.sb.auth.getSession();
+      if(session){
+        // Already logged in — go straight to dashboard
+        await loadUserAndGo(session.user);
+        return;
+      }
+    }catch(e){
+      console.warn('Session check failed:',e);
+    }
+  } else {
+    console.error('Supabase connection failed. Check credentials.');
+  }
+  hideLoad();
+  showPage('pg-landing');
+}
+
+// Listen for Supabase auth state changes (e.g. email confirmation, password reset)
+function setupAuthListener(){
+  if(!A.sb)return;
+  A.sb.auth.onAuthStateChange(async(event,session)=>{
+    if(event==='PASSWORD_RECOVERY'){
+      // User clicked reset link — show a password update modal or redirect
+      const newPw=prompt('Enter your new password (min 6 characters):');
+      if(newPw&&newPw.length>=6){
+        const{error}=await A.sb.auth.updateUser({password:newPw});
+        if(!error) alert('Password updated! Please log in again.');
+      }
+    }
+    if(event==='SIGNED_IN'&&session&&!A.user){
+      await loadUserAndGo(session.user);
+    }
+  });
+}
+
+startup().then(()=>{ if(A.sb) setupAuthListener(); });
+
+/* ════════════════════════════════════════════
+   CALCULATOR LOGIC
+════════════════════════════════════════════ */
+const Calc = {
+  current: '0',      // what's shown on display
+  expr: '',          // full expression string e.g. "120 + 340"
+  operator: null,    // pending operator
+  prevVal: null,     // value before operator
+  justEvaled: false  // flag: just pressed =
+};
+
+function toggleCalc(){
+  const panel = document.getElementById('calc-panel');
+  const btn   = document.getElementById('calc-toggle-btn');
+  const open  = panel.classList.toggle('open');
+  btn.style.background = open ? 'rgba(91,141,238,.35)' : '';
+  btn.style.borderColor = open ? '#5b8dee' : '';
+  if(open){
+    // Pre-fill calculator with current amount if already entered
+    const existing = parseFloat(document.getElementById('tx-amt').value);
+    if(existing > 0){
+      Calc.current = String(existing);
+      Calc.expr = '';
+      Calc.operator = null;
+      Calc.prevVal = null;
+      Calc.justEvaled = false;
+      calcRefresh();
+    }
+  }
+}
+
+function calcRefresh(){
+  document.getElementById('calc-result').textContent = Calc.current;
+  document.getElementById('calc-expr').textContent   = Calc.expr;
+  const val = parseFloat(Calc.current);
+  const useBtn = document.getElementById('calc-use-btn');
+  useBtn.disabled = isNaN(val) || val <= 0;
+}
+
+function calcNum(n){
+  if(Calc.justEvaled){ Calc.current='0'; Calc.justEvaled=false; }
+  if(n === '.'){
+    if(Calc.current.includes('.')) return; // no double dot
+    Calc.current = (Calc.current === '0' ? '0' : Calc.current) + '.';
+  } else if(n === '00'){
+    if(Calc.current === '0') return;
+    Calc.current += '00';
+  } else {
+    Calc.current = Calc.current === '0' ? n : Calc.current + n;
+  }
+  // Limit display length
+  if(Calc.current.replace('.','').length > 12) return;
+  calcRefresh();
+}
+
+function calcOp(op){
+  Calc.justEvaled = false;
+  const cur = parseFloat(Calc.current);
+  if(Calc.operator && Calc.prevVal !== null){
+    // Chain calculation
+    const result = calcCompute(Calc.prevVal, cur, Calc.operator);
+    Calc.current  = fmtNum(result);
+    Calc.prevVal  = result;
+  } else {
+    Calc.prevVal = cur;
+  }
+  Calc.operator = op;
+  Calc.expr     = Calc.current + ' ' + op;
+  Calc.current  = '0';
+  calcRefresh();
+}
+
+function calcEquals(){
+  if(Calc.operator === null || Calc.prevVal === null) return;
+  const cur    = parseFloat(Calc.current);
+  const result = calcCompute(Calc.prevVal, cur, Calc.operator);
+  Calc.expr     = Calc.expr + ' ' + Calc.current + ' =';
+  Calc.current  = fmtNum(result);
+  Calc.operator = null;
+  Calc.prevVal  = null;
+  Calc.justEvaled = true;
+  calcRefresh();
+}
+
+function calcCompute(a, b, op){
+  switch(op){
+    case '+': return a + b;
+    case '−': return a - b;
+    case '×': return a * b;
+    case '÷': return b === 0 ? 0 : a / b;
+    case '%': return a * (b / 100);
+    default:  return b;
+  }
+}
+
+function fmtNum(n){
+  if(isNaN(n) || !isFinite(n)) return '0';
+  // Up to 8 decimal places, trim trailing zeros
+  return parseFloat(n.toFixed(8)).toString();
+}
+
+function calcClear(){
+  Calc.current    = '0';
+  Calc.expr       = '';
+  Calc.operator   = null;
+  Calc.prevVal    = null;
+  Calc.justEvaled = false;
+  calcRefresh();
+}
+
+function calcDel(){
+  if(Calc.justEvaled){ calcClear(); return; }
+  if(Calc.current.length <= 1){ Calc.current = '0'; }
+  else { Calc.current = Calc.current.slice(0, -1); }
+  calcRefresh();
+}
+
+function calcUseAmount(){
+  const val = parseFloat(Calc.current);
+  if(!val || val <= 0) return;
+  // Put result into amount field
+  document.getElementById('tx-amt').value = val;
+  document.getElementById('tx-amt-err').textContent = '';
+  // Close calculator
+  document.getElementById('calc-panel').classList.remove('open');
+  document.getElementById('calc-toggle-btn').style.background = '';
+  document.getElementById('calc-toggle-btn').style.borderColor = '';
+  // Flash the amount field green briefly
+  const inp = document.getElementById('tx-amt');
+  inp.style.borderColor = '#1baf7a';
+  inp.style.background  = 'rgba(27,175,122,.12)';
+  setTimeout(()=>{
+    inp.style.borderColor = '';
+    inp.style.background  = '';
+  }, 800);
+}
+/* ── End Calculator ── */
+
+</script>
+</body>
+</html>
