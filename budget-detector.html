@@ -485,7 +485,6 @@ select.inp{cursor:pointer}
   <div class="nav">
     <span class="logo">Budget <span>Detector</span></span>
     <div style="display:flex;gap:8px;align-items:center">
-      <span id="sb-status-tag"></span>
       <button class="btn btn-sm" onclick="showAuth('login')">Log in</button>
       <button class="btn btn-primary btn-sm" onclick="showAuth('register')">Sign up free</button>
     </div>
@@ -681,7 +680,6 @@ serve(async (req) =&gt; {
   </div>
   <div class="nav" style="position:relative;z-index:10;background:rgba(255,255,255,0.75);backdrop-filter:blur(10px)">
     <span class="logo" style="cursor:pointer" onclick="showPage('pg-landing')">Budget <span>Detector</span></span>
-    <span id="auth-sb-tag" class="sb-tag" style="display:none">⚡ Supabase Auth</span>
   </div>
   <div class="auth-wrap">
     <div class="auth-card">
@@ -1090,8 +1088,6 @@ async function connectSupabase(){
     localStorage.setItem('sb_url', url);
     localStorage.setItem('sb_key', key);
     hideLoad();
-    document.getElementById('sb-status-tag').innerHTML='<span class="connected-badge">🟢 Supabase Connected</span>';
-    document.getElementById('auth-sb-tag').style.display='';
     const {data:{session}}=await A.sb.auth.getSession();
     if(session){await loadUserAndGo(session.user);}
     else{showPage('pg-auth');switchTab('login');}
@@ -2212,8 +2208,6 @@ async function startup(){
   // Always connect using hardcoded credentials — works on every device automatically
   const ok = initSupabase(SUPABASE_URL, SUPABASE_KEY);
   if(ok){
-    document.getElementById('sb-status-tag').innerHTML='<span class="connected-badge">🟢 Supabase Connected</span>';
-    document.getElementById('auth-sb-tag').style.display='';
     try{
       // Check if user is already logged in on this device
       const {data:{session}} = await A.sb.auth.getSession();
@@ -2393,7 +2387,7 @@ function calcUseAmount(){
 /* ════════════════════════════════════════════
    CATCHING MONEY GAME LOGIC
 ════════════════════════════════════════════ */
-const CatchGame = {
+var CatchGame = {
   container: null,
   boy: null,
   scoreVal: null,
