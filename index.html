@@ -533,6 +533,17 @@ select.inp{cursor:pointer}
 .btn-calendar.wiggle i {
   animation: calendar-wiggle 1.2s ease-in-out;
 }
+
+.btn-logout {
+  transition: all 0.3s ease !important;
+}
+.btn-logout:hover {
+  border-color: #e34948 !important;
+  color: #e34948 !important;
+  background-color: #fcebeb !important;
+  box-shadow: 0 0 12px rgba(227, 73, 72, 0.15) !important;
+  transform: translateY(-1px);
+}
 </style>
 </head>
 <body>
@@ -816,14 +827,14 @@ serve(async (req) =&gt; {
 <!-- ═══════════ DASHBOARD ═══════════ -->
 <div id="pg-dashboard" class="page">
   <div class="nav">
-    <button class="btn btn-sm btn-calendar" onclick="openCal()" title="Calendar" id="btn-calendar">
-      <i class="ti ti-calendar"></i>
-      <span class="calendar-badge-pulse" id="cal-badge" style="display: none;"></span>
-    </button>
     <span class="logo">Budget <span>Detector</span></span>
     <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn btn-sm btn-calendar" onclick="openCal()" title="Calendar" id="btn-calendar">
+        <i class="ti ti-calendar"></i>
+        <span class="calendar-badge-pulse" id="cal-badge" style="display: none;"></span>
+      </button>
       <span id="dash-yr" style="font-size:13px;font-weight:500;color:#5f5e5a"></span>
-      <button class="btn btn-sm" onclick="doLogout()">Log out</button>
+      <button class="btn btn-sm btn-logout" onclick="doLogout()">Log out</button>
     </div>
   </div>
   <div class="container">
