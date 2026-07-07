@@ -544,6 +544,41 @@ select.inp{cursor:pointer}
   box-shadow: 0 0 12px rgba(227, 73, 72, 0.15) !important;
   transform: translateY(-1px);
 }
+
+/* Greeting and Summary animations */
+.dashboard-header {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.page.active .dashboard-header {
+  animation: slide-up-fade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.15s;
+}
+
+@keyframes slide-up-fade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wave-hand {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  animation: wave-animation 2.5s infinite;
+  margin-left: 2px;
+}
+
+@keyframes wave-animation {
+  0% { transform: rotate( 0deg) }
+  10% { transform: rotate(14deg) }
+  20% { transform: rotate(-8deg) }
+  30% { transform: rotate(14deg) }
+  40% { transform: rotate(-4deg) }
+  50% { transform: rotate(10deg) }
+  60% { transform: rotate( 0deg) }
+  100% { transform: rotate( 0deg) }
+}
 </style>
 </head>
 <body>
@@ -839,8 +874,8 @@ serve(async (req) =&gt; {
   </div>
   <div class="container">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-      <div>
-        <p style="font-size:15px;color:#5f5e5a">Hello, <strong id="dash-name" style="color:#1a1a18"></strong> 👋</p>
+      <div class="dashboard-header">
+        <p style="font-size:15px;color:#5f5e5a">Hello, <strong id="dash-name" style="color:#1a1a18"></strong> <span class="wave-hand">👋</span></p>
         <p style="font-size:12px;color:#888780" id="dash-month-lbl"></p>
       </div>
       <button class="btn btn-primary btn-sm" onclick="openBudgetModal(null,null)"><i class="ti ti-settings" style="margin-right:4px"></i>Set monthly budget</button>
