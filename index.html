@@ -788,6 +788,26 @@ select.inp{cursor:pointer}
     box-shadow: 0 0 25px rgba(42, 120, 214, 0.8);
   }
 }
+
+/* ── Mobile Responsive Overrides ── */
+@media (max-width: 768px) {
+  .g2, .g3, .g4 {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .months-grid-responsive {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .feat-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.months-grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
 </style>
 </head>
 <body>
@@ -1107,7 +1127,7 @@ serve(async (req) =&gt; {
         <button class="year-btn" onclick="changeYear(1)">›</button>
       </div>
     </div>
-    <div id="months-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px"></div>
+    <div id="months-grid" class="months-grid-responsive" style="margin-bottom:28px"></div>
     <div style="font-size:15px;font-weight:700;margin-bottom:12px">Spending analytics</div>
     <div class="g2" style="margin-bottom:40px">
       <div class="card" style="position:relative; overflow:visible;">
@@ -1122,7 +1142,7 @@ serve(async (req) =&gt; {
       </div>
       <div class="card" style="position:relative; overflow:visible;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <div style="font-size:13px;font-weight:600;color:#5f5e5a">Category breakdown (year)</div>
+          <div style="font-size:13px;font-weight:600;color:#5f5e5a" id="chart-pie-title">Category breakdown (year)</div>
           <div style="font-size:11px;color:#888780;display:flex;align-items:center;gap:4px;"><span>Drag to rotate</span><span style="font-size:12px;">🔄</span></div>
         </div>
         <div style="position:relative;height:260px">
@@ -2974,6 +2994,12 @@ function renderChartsFromData(totals, budgets, catData){
     A.pieChart.destroy();
   }
   const pieCanvas = document.getElementById('chart-pie');
+
+  // Set the dynamic title for the selected year
+  const pieTitle = document.getElementById('chart-pie-title');
+  if (pieTitle) {
+    pieTitle.textContent = `Category breakdown (${A.currentYear})`;
+  }
 
   // Filter only categories with positive spending for the current year
   const activeLabels = [];
