@@ -1132,7 +1132,6 @@ serve(async (req) =&gt; {
         <div id="chart-pie-summary" style="margin-top:12px;font-size:12px;border-top:1px solid rgba(0,0,0,0.08);padding-top:10px;display:flex;justify-content:space-between;gap:8px;"></div>
       </div>
     </div>
-    <div style="font-size:10px;color:#888780;text-align:center;margin:20px 0;opacity:0.6;" id="debug-url"></div>
   </div>
 </div>
 
@@ -3520,9 +3519,6 @@ const SUPABASE_URL = 'https://ywkqegaparzgvthaomjr.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3a3FlZ2FwYXJ6Z3Z0aGFvbWpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1OTI4NDMsImV4cCI6MjA5ODE2ODg0M30.lqtESeWacDuWS-zXRh83DaP9SnjaugoNbhRRsOLobM0';
 
 async function startup(){
-  try {
-    document.getElementById('debug-url').textContent = "Current File / URL: " + window.location.href;
-  } catch(e) {}
   showLoad('Connecting to database…');
   // Check if user has saved credentials in localStorage first, fallback to hardcoded
   const savedUrl = localStorage.getItem('sb_url');
