@@ -2974,9 +2974,27 @@ function renderChartsFromData(totals, budgets, catData){
     A.pieChart.destroy();
   }
   const pieCanvas = document.getElementById('chart-pie');
-  const pd = CATS.map(c => Math.round(catData[c]));
-  const pieColors = CATS.map(c => CC[c]);
-  A.pieChart = new ThreeDPieChart(pieCanvas, CATS, pd, pieColors);
+
+  // Filter only categories with positive spending for the current year
+  const activeLabels = [];
+  const activeData = [];
+  const activeColors = [];
+  
+  CATS.forEach(c => {
+    const val = Math.round(catData[c] || 0);
+    if (val > 0) {
+      activeLabels.push(c);
+      activeData.push(val);
+      activeColors.push(CC[c]);
+    }
+  });
+
+  if (activeData.length === 0) {
+    // If no spending at all, pass a placeholder item
+    A.pieChart = new ThreeDPieChart(pieCanvas, ['No spending'], [0], ['#e8e6de']);
+  } else {
+    A.pieChart = new ThreeDPieChart(pieCanvas, activeLabels, activeData, activeColors);
+  }
 }
 
 /* ════════════════════════════════════════════
