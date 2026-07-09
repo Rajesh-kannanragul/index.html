@@ -40,6 +40,7 @@ select.inp{cursor:pointer}
   background: linear-gradient(120deg, #1a1a18 0%, #1a1a18 35%, #2a78d6 50%, #1baf7a 65%, #1a1a18 100%);
   background-size: 250% auto;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-position: 0% center;
   filter: drop-shadow(0 2px 4px rgba(42, 120, 214, 0.08));
@@ -51,6 +52,7 @@ select.inp{cursor:pointer}
 .logo span {
   background: inherit;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 .logo:hover {
@@ -133,6 +135,7 @@ select.inp{cursor:pointer}
   background: linear-gradient(120deg, #e8f0fe 0%, #e8f0fe 35%, #5b8dee 50%, #3ecf8e 65%, #e8f0fe 100%);
   background-size: 250% auto;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-position: 0% center;
   filter: drop-shadow(0 2px 8px rgba(91, 141, 238, 0.2));
@@ -142,6 +145,7 @@ select.inp{cursor:pointer}
 .nav-dark .logo span {
   background: inherit;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -670,6 +674,120 @@ select.inp{cursor:pointer}
   60% { transform: rotate( 0deg) }
   100% { transform: rotate( 0deg) }
 }
+
+/* ── Onboarding Tutorial Tour ── */
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.tutorial-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.tutorial-box {
+  position: absolute;
+  width: min(340px, 92vw);
+  background: #ffffff;
+  border: 1px solid rgba(42, 120, 214, 0.25);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 10000;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+  transform: translateY(10px) scale(0.95);
+  opacity: 0;
+  pointer-events: auto;
+}
+.tutorial-overlay.active .tutorial-box {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+.tutorial-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding-bottom: 8px;
+}
+.tutorial-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2a78d6;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tutorial-step-indicator {
+  font-size: 11px;
+  font-weight: 700;
+  color: #5f5e5a;
+  background: #f5f4f0;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+.tutorial-body {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #33322e;
+}
+.tutorial-progress-bar-container {
+  height: 4px;
+  background: #f1efe8;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.tutorial-progress-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #2a78d6, #1baf7a);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.tutorial-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+.tutorial-nav-buttons {
+  display: flex;
+  gap: 8px;
+}
+.tutorial-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  pointer-events: none;
+  z-index: 10001;
+  transition: all 0.3s ease;
+}
+.tutorial-highlight {
+  outline: 3px solid #2a78d6 !important;
+  outline-offset: 4px;
+  box-shadow: 0 0 15px rgba(42, 120, 214, 0.7) !important;
+  animation: tutorialPulse 1.6s infinite alternate !important;
+  position: relative !important;
+  z-index: 9998 !important;
+}
+@keyframes tutorialPulse {
+  0% {
+    outline-color: rgba(42, 120, 214, 0.5);
+    box-shadow: 0 0 8px rgba(42, 120, 214, 0.4);
+  }
+  100% {
+    outline-color: rgba(42, 120, 214, 1);
+    box-shadow: 0 0 25px rgba(42, 120, 214, 0.8);
+  }
+}
 </style>
 </head>
 <body>
@@ -731,7 +849,7 @@ select.inp{cursor:pointer}
     <div class="card" style="margin-bottom:16px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <p style="font-size:13px;font-weight:700;color:#1a1a18">📄 SQL to run in Supabase SQL Editor</p>
-        <button class="btn btn-sm" onclick="copySQL()"><i class="ti ti-copy" style="margin-right:4px"></i>Copy SQL</button>
+        <button class="btn btn-sm" onclick="copySQL(event)"><i class="ti ti-copy" style="margin-right:4px"></i>Copy SQL</button>
       </div>
       <pre id="sql-block" style="background:#1a2744;color:#a8c5e8;border-radius:10px;padding:14px;font-size:11px;overflow-x:auto;line-height:1.7;font-family:monospace">-- Run this in Supabase SQL Editor
 
@@ -959,6 +1077,9 @@ serve(async (req) =&gt; {
         <i class="ti ti-calendar"></i>
         <span class="calendar-badge-pulse" id="cal-badge" style="display: none;"></span>
       </button>
+      <button class="btn btn-sm btn-outline btn-tour" onclick="startTutorial(true)" title="Dashboard Tour" id="btn-tour" style="border-color:#2a78d6;color:#2a78d6;display:flex;align-items:center;gap:4px;">
+        <i class="ti ti-help"></i> Tour
+      </button>
       <span id="dash-yr" style="font-size:13px;font-weight:500;color:#5f5e5a"></span>
       <button class="btn btn-sm btn-logout" onclick="doLogout()">Log out</button>
     </div>
@@ -969,7 +1090,7 @@ serve(async (req) =&gt; {
         <p style="font-size:15px;color:#5f5e5a">Hello, <strong id="dash-name" style="color:#1a1a18"></strong> <span class="wave-hand">👋</span></p>
         <p style="font-size:12px;color:#888780" id="dash-month-lbl"></p>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="openBudgetModal(null,null)"><i class="ti ti-settings" style="margin-right:4px"></i>Set monthly budget</button>
+      <button class="btn btn-primary btn-sm" id="btn-set-budget" onclick="openBudgetModal(null,null)"><i class="ti ti-settings" style="margin-right:4px"></i>Set monthly budget</button>
     </div>
     <div id="dash-budget-prompt" class="budget-prompt hidden">
       <span style="font-size:22px">💡</span>
@@ -989,9 +1110,29 @@ serve(async (req) =&gt; {
     <div id="months-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px"></div>
     <div style="font-size:15px;font-weight:700;margin-bottom:12px">Spending analytics</div>
     <div class="g2" style="margin-bottom:40px">
-      <div class="card"><div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#5f5e5a">Budget vs Total spending</div><div style="position:relative;height:200px"><canvas id="chart-bar"></canvas></div></div>
-      <div class="card"><div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#5f5e5a">Category breakdown (year)</div><div style="position:relative;height:200px"><canvas id="chart-pie"></canvas></div></div>
+      <div class="card" style="position:relative; overflow:visible;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:600;color:#5f5e5a">Budget vs Total spending</div>
+          <div style="font-size:11px;color:#888780;display:flex;align-items:center;gap:4px;"><span>Drag to rotate</span><span style="font-size:12px;">🔄</span></div>
+        </div>
+        <div style="position:relative;height:260px">
+          <canvas id="chart-bar" style="width:100%;height:100%;display:block;cursor:grab;"></canvas>
+          <div id="chart-bar-tooltip" style="position:absolute;pointer-events:none;background:rgba(26,39,68,0.95);color:#fff;padding:10px 14px;border-radius:10px;font-size:12px;display:none;z-index:100;box-shadow:0 10px 25px rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.15);width:max-content;line-height:1.5;"></div>
+        </div>
+      </div>
+      <div class="card" style="position:relative; overflow:visible;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:600;color:#5f5e5a">Category breakdown (year)</div>
+          <div style="font-size:11px;color:#888780;display:flex;align-items:center;gap:4px;"><span>Drag to rotate</span><span style="font-size:12px;">🔄</span></div>
+        </div>
+        <div style="position:relative;height:260px">
+          <canvas id="chart-pie" style="width:100%;height:100%;display:block;cursor:grab;"></canvas>
+          <div id="chart-pie-tooltip" style="position:absolute;pointer-events:none;background:rgba(26,39,68,0.95);color:#fff;padding:10px 14px;border-radius:10px;font-size:12px;display:none;z-index:100;box-shadow:0 10px 25px rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.15);width:max-content;line-height:1.5;"></div>
+        </div>
+        <div id="chart-pie-summary" style="margin-top:12px;font-size:12px;border-top:1px solid rgba(0,0,0,0.08);padding-top:10px;display:flex;justify-content:space-between;gap:8px;"></div>
+      </div>
     </div>
+    <div style="font-size:10px;color:#888780;text-align:center;margin:20px 0;opacity:0.6;" id="debug-url"></div>
   </div>
 </div>
 
@@ -1216,7 +1357,7 @@ const A={
   sb:null,           // Supabase client
   user:null,         // current user
   profile:null,      // profile row
-  currentYear:new Date().getFullYear(),
+  currentYear:Number(localStorage.getItem('budget_detector_current_year')) || new Date().getFullYear(),
   currentMonth:null,
   editTxId:null,
   editDay:null,
@@ -1321,10 +1462,10 @@ async function connectSupabase(){
   }
 }
 
-function copySQL(){
+function copySQL(e){
   const sql=document.getElementById('sql-block').textContent;
   navigator.clipboard.writeText(sql).then(()=>{
-    const btn=event.target.closest('button');
+    const btn=e.target.closest('button');
     const orig=btn.innerHTML;
     btn.innerHTML='<i class="ti ti-check" style="margin-right:4px"></i>Copied!';
     setTimeout(()=>btn.innerHTML=orig,2000);
@@ -1372,6 +1513,7 @@ async function doRegister(){
   if(error){err.textContent=error.message;return;}
   if(data.user && data.session){
     // Signed in immediately (email confirmation disabled)
+    sessionStorage.setItem('just_logged_in', 'true');
     await loadUserAndGo(data.user);
   } else if(data.user && !data.session){
     err.textContent='';
@@ -1409,6 +1551,7 @@ async function doLogin(){
     }
     return;
   }
+  sessionStorage.setItem('just_logged_in', 'true');
   await loadUserAndGo(data.user);
 }
 
@@ -1481,6 +1624,7 @@ function doRegisterLocal(){
   if(localUsers[email]){err.textContent='Account already exists.';return}
   localUsers[email]={name,email,pw:btoa(pw),resetCode:null,resetExpiry:null};
   A.user={id:email,email};A.profile={full_name:name};
+  sessionStorage.setItem('just_logged_in', 'true');
   renderDash();
 }
 function doLoginLocal(){
@@ -1492,6 +1636,7 @@ function doLoginLocal(){
   if(!u){err.textContent='No account found with this email.';return}
   if(u.pw!==btoa(pw)){err.textContent='Incorrect password.';return}
   A.user={id:email,email};A.profile={full_name:u.name};
+  sessionStorage.setItem('just_logged_in', 'true');
   renderDash();
 }
 function resetLocalForgot(){
@@ -1823,6 +1968,10 @@ async function renderDash(){
     console.error('Failed to render dashboard:', e);
   } finally {
     hideLoad();
+    if(sessionStorage.getItem('just_logged_in') === 'true'){
+      sessionStorage.removeItem('just_logged_in');
+      setTimeout(() => startTutorial(false), 800);
+    }
   }
 }
 
@@ -1837,17 +1986,17 @@ async function renderSummaryCards(y,m){
   document.getElementById('dash-budget-prompt').classList.toggle('hidden',!!budget);
   let html='';
   if(!budget){
-    html=`<div class="metric"><div class="metric-label">Monthly budget</div><div class="metric-val" style="color:#F59E0B;font-size:16px">Not set</div><div class="metric-sub">Tap "Set monthly budget"</div></div>
-    <div class="metric"><div class="metric-label">Total spent</div><div class="metric-val">₹${Math.round(total).toLocaleString()}</div><div class="metric-sub">All categories</div></div>
-    <div class="metric"><div class="metric-label">Remaining</div><div class="metric-val" style="color:#888780">—</div><div class="metric-sub">Set budget first</div></div>
-    <div class="metric"><div class="metric-label">Utilization</div><div class="metric-val" style="color:#888780">—</div></div>`;
+    html=`<div class="metric" id="card-budget"><div class="metric-label">Monthly budget</div><div class="metric-val" style="color:#F59E0B;font-size:16px">Not set</div><div class="metric-sub">Tap "Set monthly budget"</div></div>
+    <div class="metric" id="card-spent"><div class="metric-label">Total spent</div><div class="metric-val">₹${Math.round(total).toLocaleString()}</div><div class="metric-sub">All categories</div></div>
+    <div class="metric" id="card-remaining"><div class="metric-label">Remaining</div><div class="metric-val" style="color:#888780">—</div><div class="metric-sub">Set budget first</div></div>
+    <div class="metric" id="card-utilization"><div class="metric-label">Utilization</div><div class="metric-val" style="color:#888780">—</div></div>`;
   } else {
     const rem=budget-total,pct=Math.min(100,Math.round(total/budget*100));
     const bar=pct>80?'#e34948':pct>60?'#eda100':'#1baf7a';
-    html=`<div class="metric"><div class="metric-label">Monthly budget</div><div class="metric-val">₹${budget.toLocaleString()}</div><div class="metric-sub">Your limit</div></div>
-    <div class="metric"><div class="metric-label">Total spent</div><div class="metric-val">₹${Math.round(total).toLocaleString()}</div><div class="metric-sub">All categories</div></div>
-    <div class="metric"><div class="metric-label">Remaining</div><div class="metric-val" style="color:${rem>=0?'#1baf7a':'#e34948'}">₹${Math.abs(Math.round(rem)).toLocaleString()}</div><div class="metric-sub">${rem>=0?'Left to spend':'Over budget'}</div></div>
-    <div class="metric"><div class="metric-label">Utilization</div><div class="metric-val">${pct}%</div><div class="prog-wrap"><div class="prog-bar" style="width:${pct}%;background:${bar}"></div></div></div>`;
+    html=`<div class="metric" id="card-budget"><div class="metric-label">Monthly budget</div><div class="metric-val">₹${budget.toLocaleString()}</div><div class="metric-sub">Your limit</div></div>
+    <div class="metric" id="card-spent"><div class="metric-label">Total spent</div><div class="metric-val">₹${Math.round(total).toLocaleString()}</div><div class="metric-sub">All categories</div></div>
+    <div class="metric" id="card-remaining"><div class="metric-label">Remaining</div><div class="metric-val" style="color:${rem>=0?'#1baf7a':'#e34948'}">₹${Math.abs(Math.round(rem)).toLocaleString()}</div><div class="metric-sub">${rem>=0?'Left to spend':'Over budget'}</div></div>
+    <div class="metric" id="card-utilization"><div class="metric-label">Utilization</div><div class="metric-val">${pct}%</div><div class="prog-wrap"><div class="prog-bar" style="width:${pct}%;background:${bar}"></div></div></div>`;
   }
   document.getElementById('dash-cards').innerHTML=html;
   const al=await getAlert(y,m);
@@ -1872,27 +2021,963 @@ function renderMonthsGridFromData(totals, budgets){
 
 function changeYear(d){
   A.currentYear+=d;
+  localStorage.setItem('budget_detector_current_year', A.currentYear);
   renderDash();
 }
 
+function shadeColor(color, percent) {
+  let R = 0, G = 0, B = 0;
+  if (!color) return '#888780';
+  if (color.startsWith('#')) {
+    let hex = color.slice(1);
+    if (hex.length === 3) {
+      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+    const num = parseInt(hex, 16);
+    R = (num >> 16);
+    G = (num >> 8) & 0x00FF;
+    B = num & 0x0000FF;
+  } else if (color.startsWith('rgb')) {
+    const parts = color.match(/\d+/g);
+    R = parseInt(parts[0]);
+    G = parseInt(parts[1]);
+    B = parseInt(parts[2]);
+  } else {
+    return color;
+  }
+
+  if (percent > 0) {
+    R = Math.round(R + (255 - R) * percent);
+    G = Math.round(G + (255 - G) * percent);
+    B = Math.round(B + (255 - B) * percent);
+  } else {
+    R = Math.round(R * (1 + percent));
+    G = Math.round(G * (1 + percent));
+    B = Math.round(B * (1 + percent));
+  }
+
+  R = Math.max(0, Math.min(255, R));
+  G = Math.max(0, Math.min(255, G));
+  B = Math.max(0, Math.min(255, B));
+
+  return `rgb(${R}, ${G}, ${B})`;
+}
+
+// Global window resize handler for 3D charts
+window.addEventListener('resize', () => {
+  if (A.barChart && typeof A.barChart.resize === 'function') {
+    A.barChart.resize();
+    A.barChart.draw();
+  }
+  if (A.pieChart && typeof A.pieChart.resize === 'function') {
+    A.pieChart.resize();
+    A.pieChart.draw();
+  }
+});
+
+class ThreeDBarChart {
+  constructor(canvas, totals, budgets, options = {}) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.totals = totals;
+    this.budgets = budgets;
+    
+    this.yaw = options.yaw !== undefined ? options.yaw : Math.PI / 6;
+    this.pitch = options.pitch !== undefined ? options.pitch : 0.55;
+
+    this.tooltipEl = document.getElementById('chart-bar-tooltip');
+
+    this.boundOnMouseDown = this.onMouseDown.bind(this);
+    this.boundOnMouseMove = this.onMouseMove.bind(this);
+    this.boundOnMouseUp = this.onMouseUp.bind(this);
+    this.boundOnMouseLeave = this.onMouseLeave.bind(this);
+    this.boundOnTouchStart = this.onTouchStart.bind(this);
+    this.boundOnTouchMove = this.onTouchMove.bind(this);
+    this.boundOnTouchEnd = this.onTouchEnd.bind(this);
+
+    this.isDragging = false;
+    this.startX = 0;
+    this.startY = 0;
+    this.hoveredCol = -1;
+
+    this.initEvents();
+    this.resize();
+    this.draw();
+  }
+
+  destroy() {
+    this.canvas.removeEventListener('mousedown', this.boundOnMouseDown);
+    this.canvas.removeEventListener('mousemove', this.boundOnMouseMove);
+    window.removeEventListener('mouseup', this.boundOnMouseUp);
+    this.canvas.removeEventListener('mouseleave', this.boundOnMouseLeave);
+    this.canvas.removeEventListener('touchstart', this.boundOnTouchStart);
+    this.canvas.removeEventListener('touchmove', this.boundOnTouchMove);
+    this.canvas.removeEventListener('touchend', this.boundOnTouchEnd);
+    if (this.tooltipEl) this.tooltipEl.style.display = 'none';
+  }
+
+  initEvents() {
+    this.canvas.addEventListener('mousedown', this.boundOnMouseDown);
+    this.canvas.addEventListener('mousemove', this.boundOnMouseMove);
+    window.addEventListener('mouseup', this.boundOnMouseUp);
+    this.canvas.addEventListener('mouseleave', this.boundOnMouseLeave);
+    this.canvas.addEventListener('touchstart', this.boundOnTouchStart, { passive: false });
+    this.canvas.addEventListener('touchmove', this.boundOnTouchMove, { passive: false });
+    this.canvas.addEventListener('touchend', this.boundOnTouchEnd);
+  }
+
+  resize() {
+    const rect = this.canvas.parentElement.getBoundingClientRect();
+    const w = rect.width || 400;
+    const h = rect.height || 260;
+    
+    if (this.width !== w || this.height !== h) {
+      this.width = w;
+      this.height = h;
+      
+      const dpr = window.devicePixelRatio || 1;
+      this.canvas.width = w * dpr;
+      this.canvas.height = h * dpr;
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.ctx.scale(dpr, dpr);
+      
+      this.canvas.style.width = w + 'px';
+      this.canvas.style.height = h + 'px';
+    }
+  }
+
+  onMouseDown(e) {
+    this.isDragging = true;
+    this.startX = e.clientX;
+    this.startY = e.clientY;
+    this.canvas.style.cursor = 'grabbing';
+  }
+
+  onMouseMove(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    if (this.isDragging) {
+      const dx = e.clientX - this.startX;
+      const dy = e.clientY - this.startY;
+      this.startX = e.clientX;
+      this.startY = e.clientY;
+
+      this.yaw += dx * 0.007;
+      this.pitch = Math.max(0.2, Math.min(0.85, this.pitch - dy * 0.005));
+
+      requestAnimationFrame(() => this.draw());
+    } else {
+      this.checkHover(mx, my);
+    }
+  }
+
+  onMouseUp() {
+    this.isDragging = false;
+    this.canvas.style.cursor = 'grab';
+    requestAnimationFrame(() => this.draw());
+  }
+
+  onMouseLeave() {
+    this.isDragging = false;
+    this.canvas.style.cursor = 'grab';
+    this.hoveredCol = -1;
+    if (this.tooltipEl) this.tooltipEl.style.display = 'none';
+    requestAnimationFrame(() => this.draw());
+  }
+
+  onTouchStart(e) {
+    if (e.touches.length === 1) {
+      this.isDragging = true;
+      this.startX = e.touches[0].clientX;
+      this.startY = e.touches[0].clientY;
+    }
+  }
+
+  onTouchMove(e) {
+    if (!this.isDragging || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - this.startX;
+    const dy = e.touches[0].clientY - this.startY;
+    this.startX = e.touches[0].clientX;
+    this.startY = e.touches[0].clientY;
+
+    this.yaw += dx * 0.007;
+    this.pitch = Math.max(0.2, Math.min(0.85, this.pitch - dy * 0.005));
+
+    const rect = this.canvas.getBoundingClientRect();
+    const mx = e.touches[0].clientX - rect.left;
+    const my = e.touches[0].clientY - rect.top;
+    this.checkHover(mx, my);
+
+    requestAnimationFrame(() => this.draw());
+    e.preventDefault();
+  }
+
+  onTouchEnd() {
+    this.isDragging = false;
+    this.hoveredCol = -1;
+    if (this.tooltipEl) this.tooltipEl.style.display = 'none';
+    requestAnimationFrame(() => this.draw());
+  }
+
+  checkHover(mx, my) {
+    const leftMargin = 55;
+    const rightMargin = 25;
+    const colW = (this.width - leftMargin - rightMargin) / 12;
+
+    const colIndex = Math.floor((mx - leftMargin) / colW);
+    if (colIndex >= 0 && colIndex < 12) {
+      if (this.hoveredCol !== colIndex) {
+        this.hoveredCol = colIndex;
+        this.showTooltip(colIndex, mx, my);
+        requestAnimationFrame(() => this.draw());
+      } else {
+        this.positionTooltip(mx, my);
+      }
+    } else {
+      if (this.hoveredCol !== -1) {
+        this.hoveredCol = -1;
+        if (this.tooltipEl) this.tooltipEl.style.display = 'none';
+        requestAnimationFrame(() => this.draw());
+      }
+    }
+  }
+
+  showTooltip(index, mx, my) {
+    if (!this.tooltipEl) return;
+    const month = MN[index];
+    const spent = Math.round(this.totals[index] || 0);
+    const budget = Math.round(this.budgets[index] || 0);
+
+    let html = `<strong>${month}</strong><br/>`;
+    html += `Spent: <strong>₹${spent.toLocaleString()}</strong><br/>`;
+    if (budget > 0) {
+      html += `Budget: <strong>₹${budget.toLocaleString()}</strong><br/>`;
+      const diff = budget - spent;
+      if (diff >= 0) {
+        html += `<span style="color:#10b981;font-weight:bold;">Under budget by ₹${diff.toLocaleString()}</span>`;
+      } else {
+        html += `<span style="color:#ef4444;font-weight:bold;">Over budget by ₹${Math.abs(diff).toLocaleString()}</span>`;
+      }
+    } else {
+      html += `<span style="color:#94a3c4;font-style:italic;">No budget set</span>`;
+    }
+
+    this.tooltipEl.innerHTML = html;
+    this.tooltipEl.style.display = 'block';
+    this.positionTooltip(mx, my);
+  }
+
+  positionTooltip(mx, my) {
+    if (!this.tooltipEl) return;
+    const rect = this.canvas.parentElement.getBoundingClientRect();
+    const tooltipRect = this.tooltipEl.getBoundingClientRect();
+    
+    let x = mx + 15;
+    let y = my - tooltipRect.height - 15;
+
+    if (x + tooltipRect.width > rect.width) {
+      x = mx - tooltipRect.width - 15;
+    }
+    if (y < 0) {
+      y = my + 15;
+    }
+
+    this.tooltipEl.style.left = x + 'px';
+    this.tooltipEl.style.top = y + 'px';
+  }
+
+  draw() {
+    this.resize();
+    const ctx = this.ctx;
+    const W = this.width;
+    const H = this.height;
+
+    ctx.clearRect(0, 0, W, H);
+
+    const leftMargin = 55;
+    const rightMargin = 25;
+    const topMargin = 25;
+    const bottomMargin = 45;
+    const chartW = W - leftMargin - rightMargin;
+    const chartH = H - topMargin - bottomMargin;
+    const yBase = H - bottomMargin;
+
+    const depthX = 14 * Math.cos(this.yaw);
+    const depthY = -14 * Math.sin(this.yaw) * this.pitch;
+
+    let maxVal = 2000;
+    for (let i = 0; i < 12; i++) {
+      maxVal = Math.max(maxVal, this.totals[i] || 0, this.budgets[i] || 0);
+    }
+    const power = Math.pow(10, Math.floor(Math.log10(maxVal)));
+    const unit = power / 2 || 500;
+    maxVal = Math.ceil(maxVal / unit) * unit;
+
+    // Floor Grid
+    ctx.beginPath();
+    ctx.moveTo(leftMargin, yBase);
+    ctx.lineTo(leftMargin + chartW, yBase);
+    ctx.lineTo(leftMargin + chartW + depthX, yBase + depthY);
+    ctx.lineTo(leftMargin + depthX, yBase + depthY);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.03)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
+    ctx.stroke();
+
+    // Back Wall Grid
+    ctx.beginPath();
+    ctx.moveTo(leftMargin + depthX, yBase + depthY);
+    ctx.lineTo(leftMargin + chartW + depthX, yBase + depthY);
+    ctx.lineTo(leftMargin + chartW + depthX, topMargin + depthY);
+    ctx.lineTo(leftMargin + depthX, topMargin + depthY);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.01)';
+    ctx.fill();
+    ctx.stroke();
+
+    const gridTics = 4;
+    for (let i = 0; i <= gridTics; i++) {
+      const pct = i / gridTics;
+      const y = yBase - pct * chartH;
+      const val = pct * maxVal;
+
+      ctx.beginPath();
+      ctx.moveTo(leftMargin + depthX, y + depthY);
+      ctx.lineTo(leftMargin + chartW + depthX, y + depthY);
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.font = '10px sans-serif';
+      ctx.fillStyle = '#888780';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('₹' + Math.round(val).toLocaleString(), leftMargin - 10, y);
+    }
+
+    const colW = chartW / 12;
+    const barW = Math.max(6, colW * 0.35);
+
+    const drawList = [];
+    for (let i = 0; i < 12; i++) {
+      const budget = this.budgets[i] || 0;
+      const spent = this.totals[i] || 0;
+
+      const bx = leftMargin + i * colW + (colW - barW) / 2;
+      const budgetH = maxVal > 0 ? (budget / maxVal) * chartH : 0;
+      drawList.push({
+        index: i,
+        type: 'budget',
+        row: 0,
+        x: bx + depthX * 0.4,
+        y: yBase + depthY * 0.4,
+        w: barW,
+        h: budgetH,
+        color: '#B5D4F4',
+        val: budget
+      });
+
+      const spentH = maxVal > 0 ? (spent / maxVal) * chartH : 0;
+      const spentColor = budget > 0 && spent > budget ? '#e34948' : '#2a78d6';
+      drawList.push({
+        index: i,
+        type: 'spent',
+        row: 1,
+        x: bx,
+        y: yBase,
+        w: barW,
+        h: spentH,
+        color: spentColor,
+        val: spent
+      });
+    }
+
+    drawList.sort((a, b) => {
+      if (a.row !== b.row) return a.row - b.row;
+      return depthX >= 0 ? a.x - b.x : b.x - a.x;
+    });
+
+    drawList.forEach(item => {
+      const isHovered = item.index === this.hoveredCol;
+      const color = isHovered ? shadeColor(item.color, 0.15) : item.color;
+      const isTransparent = item.type === 'budget';
+
+      if (item.h <= 0) {
+        if (isTransparent && item.val > 0) {
+          this.draw3DCuboid(ctx, item.x, item.y, item.w, 2, depthX * 0.6, depthY * 0.6, color, true);
+        }
+        return;
+      }
+
+      this.draw3DCuboid(ctx, item.x, item.y, item.w, item.h, depthX * 0.6, depthY * 0.6, color, isTransparent);
+    });
+
+    for (let i = 0; i < 12; i++) {
+      const x = leftMargin + i * colW + colW / 2;
+      ctx.save();
+      ctx.translate(x, yBase + 15);
+      if (i === this.hoveredCol) {
+        ctx.font = 'bold 10px sans-serif';
+        ctx.fillStyle = '#2a78d6';
+      } else {
+        ctx.font = '10px sans-serif';
+        ctx.fillStyle = '#1a1a18';
+      }
+      ctx.textAlign = 'center';
+      ctx.fillText(MN[i].slice(0, 3), 0, 0);
+      ctx.restore();
+    }
+  }
+
+  draw3DCuboid(ctx, x, y, w, h, dx, dy, color, isTransparent) {
+    ctx.beginPath();
+    if (dx >= 0) {
+      ctx.moveTo(x + w, y);
+      ctx.lineTo(x + w + dx, y + dy);
+      ctx.lineTo(x + w + dx, y - h + dy);
+      ctx.lineTo(x + w, y - h);
+    } else {
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + dx, y + dy);
+      ctx.lineTo(x + dx, y - h + dy);
+      ctx.lineTo(x, y - h);
+    }
+    ctx.closePath();
+    ctx.fillStyle = isTransparent ? 'rgba(181, 212, 244, 0.15)' : shadeColor(color, -0.25);
+    ctx.fill();
+    ctx.strokeStyle = isTransparent ? color : 'rgba(255, 255, 255, 0.2)';
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x, y - h);
+    ctx.lineTo(x + w, y - h);
+    ctx.lineTo(x + w + dx, y - h + dy);
+    ctx.lineTo(x + dx, y - h + dy);
+    ctx.closePath();
+    ctx.fillStyle = isTransparent ? 'rgba(181, 212, 244, 0.25)' : shadeColor(color, 0.15);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.rect(x, y - h, w, h);
+    ctx.fillStyle = isTransparent ? 'rgba(181, 212, 244, 0.12)' : color;
+    ctx.fill();
+    ctx.stroke();
+  }
+}
+
+class ThreeDPieChart {
+  constructor(canvas, labels, data, colors, options = {}) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.labels = labels;
+    this.data = data;
+    this.colors = colors;
+
+    this.yaw = options.yaw !== undefined ? options.yaw : -Math.PI / 4;
+    this.pitch = options.pitch !== undefined ? options.pitch : 0.55;
+    this.height3d = options.height3d !== undefined ? options.height3d : 22;
+
+    this.tooltipEl = document.getElementById('chart-pie-tooltip');
+    this.summaryEl = document.getElementById('chart-pie-summary');
+
+    this.boundOnMouseDown = this.onMouseDown.bind(this);
+    this.boundOnMouseMove = this.onMouseMove.bind(this);
+    this.boundOnMouseUp = this.onMouseUp.bind(this);
+    this.boundOnMouseLeave = this.onMouseLeave.bind(this);
+    this.boundOnTouchStart = this.onTouchStart.bind(this);
+    this.boundOnTouchMove = this.onTouchMove.bind(this);
+    this.boundOnTouchEnd = this.onTouchEnd.bind(this);
+
+    this.isDragging = false;
+    this.startX = 0;
+    this.startY = 0;
+    this.hoveredSlice = -1;
+
+    this.initEvents();
+    this.resize();
+    this.draw();
+    this.updateSummary();
+  }
+
+  destroy() {
+    this.canvas.removeEventListener('mousedown', this.boundOnMouseDown);
+    this.canvas.removeEventListener('mousemove', this.boundOnMouseMove);
+    window.removeEventListener('mouseup', this.boundOnMouseUp);
+    this.canvas.removeEventListener('mouseleave', this.boundOnMouseLeave);
+    this.canvas.removeEventListener('touchstart', this.boundOnTouchStart);
+    this.canvas.removeEventListener('touchmove', this.boundOnTouchMove);
+    this.canvas.removeEventListener('touchend', this.boundOnTouchEnd);
+    if (this.tooltipEl) this.tooltipEl.style.display = 'none';
+  }
+
+  initEvents() {
+    this.canvas.addEventListener('mousedown', this.boundOnMouseDown);
+    this.canvas.addEventListener('mousemove', this.boundOnMouseMove);
+    window.addEventListener('mouseup', this.boundOnMouseUp);
+    this.canvas.addEventListener('mouseleave', this.boundOnMouseLeave);
+    this.canvas.addEventListener('touchstart', this.boundOnTouchStart, { passive: false });
+    this.canvas.addEventListener('touchmove', this.boundOnTouchMove, { passive: false });
+    this.canvas.addEventListener('touchend', this.boundOnTouchEnd);
+  }
+
+  resize() {
+    const rect = this.canvas.parentElement.getBoundingClientRect();
+    const w = rect.width || 400;
+    const h = rect.height || 260;
+
+    if (this.width !== w || this.height !== h) {
+      this.width = w;
+      this.height = h;
+
+      const dpr = window.devicePixelRatio || 1;
+      this.canvas.width = w * dpr;
+      this.canvas.height = h * dpr;
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.ctx.scale(dpr, dpr);
+
+      this.canvas.style.width = w + 'px';
+      this.canvas.style.height = h + 'px';
+    }
+  }
+
+  onMouseDown(e) {
+    this.isDragging = true;
+    this.startX = e.clientX;
+    this.startY = e.clientY;
+    this.canvas.style.cursor = 'grabbing';
+  }
+
+  onMouseMove(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    if (this.isDragging) {
+      const dx = e.clientX - this.startX;
+      const dy = e.clientY - this.startY;
+      this.startX = e.clientX;
+      this.startY = e.clientY;
+
+      this.yaw += dx * 0.007;
+      this.pitch = Math.max(0.2, Math.min(0.85, this.pitch - dy * 0.005));
+
+      requestAnimationFrame(() => this.draw());
+    } else {
+      this.checkHover(mx, my);
+    }
+  }
+
+  onMouseUp() {
+    this.isDragging = false;
+    this.canvas.style.cursor = 'grab';
+    requestAnimationFrame(() => this.draw());
+  }
+
+  onMouseLeave() {
+    this.isDragging = false;
+    this.canvas.style.cursor = 'grab';
+    this.hoveredSlice = -1;
+    if (this.tooltipEl) this.tooltipEl.style.display = 'none';
+    requestAnimationFrame(() => this.draw());
+  }
+
+  onTouchStart(e) {
+    if (e.touches.length === 1) {
+      this.isDragging = true;
+      this.startX = e.touches[0].clientX;
+      this.startY = e.touches[0].clientY;
+    }
+  }
+
+  onTouchMove(e) {
+    if (!this.isDragging || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - this.startX;
+    const dy = e.touches[0].clientY - this.startY;
+    this.startX = e.touches[0].clientX;
+    this.startY = e.touches[0].clientY;
+
+    this.yaw += dx * 0.007;
+    this.pitch = Math.max(0.2, Math.min(0.85, this.pitch - dy * 0.005));
+
+    const rect = this.canvas.getBoundingClientRect();
+    const mx = e.touches[0].clientX - rect.left;
+    const my = e.touches[0].clientY - rect.top;
+    this.checkHover(mx, my);
+
+    requestAnimationFrame(() => this.draw());
+    e.preventDefault();
+  }
+
+  onTouchEnd() {
+    this.isDragging = false;
+    this.hoveredSlice = -1;
+    if (this.tooltipEl) this.tooltipEl.style.display = 'none';
+    requestAnimationFrame(() => this.draw());
+  }
+
+  checkHover(mx, my) {
+    const slices = this.getSlicesGeometry();
+    let hoveredIdx = -1;
+
+    for (let i = 0; i < slices.length; i++) {
+      const slice = slices[i];
+      let dx = mx - slice.ecx;
+      let dy = my - slice.ecy;
+      let flat_dy = dy / this.pitch;
+      let dist = Math.sqrt(dx * dx + flat_dy * flat_dy);
+      let angle = Math.atan2(flat_dy, dx);
+
+      if (this.angleBetween(angle, slice.startAngle, slice.endAngle) && dist <= slice.rx) {
+        hoveredIdx = slice.index;
+        break;
+      }
+
+      let hitSide = false;
+      for (let offset = 1; offset <= slice.h; offset += 2) {
+        let dy_offset = my - offset - slice.ecy;
+        let flat_dy_offset = dy_offset / this.pitch;
+        let dist_offset = Math.sqrt(dx * dx + flat_dy_offset * flat_dy_offset);
+        let angle_offset = Math.atan2(flat_dy_offset, dx);
+        if (this.angleBetween(angle_offset, slice.startAngle, slice.endAngle) && dist_offset <= slice.rx) {
+          hoveredIdx = slice.index;
+          hitSide = true;
+          break;
+        }
+      }
+      if (hitSide) break;
+    }
+
+    if (hoveredIdx !== this.hoveredSlice) {
+      this.hoveredSlice = hoveredIdx;
+      if (hoveredIdx !== -1) {
+        this.showTooltip(hoveredIdx, mx, my);
+      } else {
+        if (this.tooltipEl) this.tooltipEl.style.display = 'none';
+      }
+      requestAnimationFrame(() => this.draw());
+    } else if (hoveredIdx !== -1) {
+      this.positionTooltip(mx, my);
+    }
+  }
+
+  showTooltip(index, mx, my) {
+    if (!this.tooltipEl) return;
+    const label = this.labels[index];
+    const val = this.data[index];
+    const total = this.data.reduce((sum, v) => sum + v, 0);
+    const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0.0';
+
+    let statusBadge = '';
+    const nonZeroData = this.data.filter(v => v > 0);
+    if (nonZeroData.length > 0) {
+      const maxVal = Math.max(...this.data);
+      const minVal = Math.min(...nonZeroData);
+      if (val === maxVal && val > 0) {
+        statusBadge = `<br/><span style="color:#ef4444;font-weight:bold;">🔥 Most Spent Category</span>`;
+      } else if (val === minVal && val > 0) {
+        statusBadge = `<br/><span style="color:#10b981;font-weight:bold;">🏆 Least Spent Category</span>`;
+      }
+    }
+
+    let html = `<strong>${label}</strong><br/>`;
+    html += `Spent: <strong>₹${val.toLocaleString()}</strong> (${pct}%)${statusBadge}`;
+
+    this.tooltipEl.innerHTML = html;
+    this.tooltipEl.style.display = 'block';
+    this.positionTooltip(mx, my);
+  }
+
+  positionTooltip(mx, my) {
+    if (!this.tooltipEl) return;
+    const rect = this.canvas.parentElement.getBoundingClientRect();
+    const tooltipRect = this.tooltipEl.getBoundingClientRect();
+    
+    let x = mx + 15;
+    let y = my - tooltipRect.height - 15;
+
+    if (x + tooltipRect.width > rect.width) {
+      x = mx - tooltipRect.width - 15;
+    }
+    if (y < 0) {
+      y = my + 15;
+    }
+
+    this.tooltipEl.style.left = x + 'px';
+    this.tooltipEl.style.top = y + 'px';
+  }
+
+  normalizeAngle(a) {
+    a = a % (2 * Math.PI);
+    if (a < 0) a += 2 * Math.PI;
+    return a;
+  }
+
+  angleBetween(angle, start, end) {
+    const s = this.normalizeAngle(start);
+    const e = this.normalizeAngle(end);
+    const a = this.normalizeAngle(angle);
+    if (s <= e) {
+      return a >= s && a <= e;
+    } else {
+      return a >= s || a <= e;
+    }
+  }
+
+  getSlicesGeometry() {
+    const total = this.data.reduce((sum, v) => sum + v, 0);
+    const rx = Math.min(this.width, this.height) * 0.36;
+    const ry = rx * this.pitch;
+    const cx = this.width / 2;
+    const cy = this.height / 2 - this.height3d / 2;
+
+    let currentAngle = this.yaw;
+    const slices = [];
+
+    const nonZeroData = this.data.filter(v => v > 0);
+    const maxVal = nonZeroData.length > 0 ? Math.max(...nonZeroData) : 0;
+
+    for (let i = 0; i < this.data.length; i++) {
+      const val = this.data[i];
+      if (total === 0) {
+        const sliceAngle = (2 * Math.PI) / this.data.length;
+        const start = currentAngle;
+        const end = currentAngle + sliceAngle;
+        const mid = (start + end) / 2;
+        slices.push({
+          index: i,
+          startAngle: start,
+          endAngle: end,
+          midAngle: mid,
+          val: 0,
+          color: '#e8e6de',
+          rx, ry, cx, cy,
+          ecx: cx, ecy: cy,
+          h: this.height3d,
+          isMostSpent: false
+        });
+        currentAngle = end;
+      } else {
+        if (val <= 0) continue;
+        const pct = val / total;
+        const sliceAngle = pct * 2 * Math.PI;
+        const start = currentAngle;
+        const end = currentAngle + sliceAngle;
+        const mid = (start + end) / 2;
+
+        const isMostSpent = val === maxVal;
+        
+        let ecx = cx;
+        let ecy = cy;
+        const explodeDist = 14;
+        if (isMostSpent) {
+          ecx += Math.cos(mid) * explodeDist;
+          ecy += Math.sin(mid) * explodeDist * this.pitch;
+        }
+
+        slices.push({
+          index: i,
+          startAngle: start,
+          endAngle: end,
+          midAngle: mid,
+          val,
+          color: this.colors[i],
+          rx, ry, cx, cy,
+          ecx, ecy,
+          h: isMostSpent ? this.height3d * 1.3 : this.height3d,
+          isMostSpent
+        });
+        currentAngle = end;
+      }
+    }
+    return slices;
+  }
+
+  draw() {
+    this.resize();
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.width, this.height);
+
+    const slices = this.getSlicesGeometry();
+    if (slices.length === 0) {
+      ctx.beginPath();
+      ctx.ellipse(this.width/2, this.height/2, 90, 90 * this.pitch, 0, 0, 2 * Math.PI);
+      ctx.fillStyle = '#e8e6de';
+      ctx.fill();
+      ctx.strokeStyle = '#d6d4cd';
+      ctx.stroke();
+      return;
+    }
+
+    const sortedSlices = [...slices].sort((a, b) => {
+      return Math.sin(a.midAngle) - Math.sin(b.midAngle);
+    });
+
+    sortedSlices.forEach(slice => {
+      const isHovered = slice.index === this.hoveredSlice;
+      const color = isHovered ? shadeColor(slice.color, 0.15) : slice.color;
+      
+      const scx = slice.ecx;
+      const scy = slice.ecy;
+      const rx = slice.rx;
+      const ry = slice.ry;
+      const h = slice.h;
+      const start = slice.startAngle;
+      const end = slice.endAngle;
+
+      ctx.fillStyle = shadeColor(color, -0.25 + 0.1 * Math.cos(start));
+      ctx.beginPath();
+      ctx.moveTo(scx, scy);
+      ctx.lineTo(scx, scy + h);
+      ctx.lineTo(scx + rx * Math.cos(start), scy + ry * Math.sin(start) + h);
+      ctx.lineTo(scx + rx * Math.cos(start), scy + ry * Math.sin(start));
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = shadeColor(color, -0.25 - 0.1 * Math.cos(end));
+      ctx.beginPath();
+      ctx.moveTo(scx, scy);
+      ctx.lineTo(scx, scy + h);
+      ctx.lineTo(scx + rx * Math.cos(end), scy + ry * Math.sin(end) + h);
+      ctx.lineTo(scx + rx * Math.cos(end), scy + ry * Math.sin(end));
+      ctx.closePath();
+      ctx.fill();
+
+      const sideGrad = ctx.createLinearGradient(
+        scx + rx * Math.cos(start), scy + ry * Math.sin(start),
+        scx + rx * Math.cos(end), scy + ry * Math.sin(end)
+      );
+      sideGrad.addColorStop(0, shadeColor(color, -0.35));
+      sideGrad.addColorStop(0.5, shadeColor(color, -0.2));
+      sideGrad.addColorStop(1, shadeColor(color, -0.3));
+
+      ctx.fillStyle = sideGrad;
+      ctx.beginPath();
+      ctx.ellipse(scx, scy, rx, ry, 0, start, end);
+      ctx.lineTo(scx + rx * Math.cos(end), scy + ry * Math.sin(end) + h);
+      ctx.ellipse(scx, scy + h, rx, ry, 0, end, start, true);
+      ctx.lineTo(scx + rx * Math.cos(start), scy + ry * Math.sin(start));
+      ctx.closePath();
+      ctx.fill();
+    });
+
+    sortedSlices.forEach(slice => {
+      const isHovered = slice.index === this.hoveredSlice;
+      const color = isHovered ? shadeColor(slice.color, 0.12) : slice.color;
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(slice.ecx, slice.ecy);
+      ctx.ellipse(slice.ecx, slice.ecy, slice.rx, slice.ry, 0, slice.startAngle, slice.endAngle);
+      ctx.closePath();
+      ctx.fill();
+      
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      const total = this.data.reduce((sum, v) => sum + v, 0);
+      const pct = total > 0 ? (slice.val / total) : 0;
+      if (pct > 0.08) {
+        const lx = slice.ecx + Math.cos(slice.midAngle) * slice.rx * 0.65;
+        const ly = slice.ecy + Math.sin(slice.midAngle) * slice.ry * 0.65;
+        
+        ctx.font = 'bold 9px sans-serif';
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        ctx.shadowColor = 'rgba(0,0,0,0.4)';
+        ctx.shadowBlur = 3;
+        ctx.fillText(Math.round(pct * 100) + '%', lx, ly);
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+      }
+    });
+  }
+
+  updateSummary() {
+    if (!this.summaryEl) return;
+    const total = this.data.reduce((sum, v) => sum + v, 0);
+    if (total === 0) {
+      this.summaryEl.innerHTML = `<div style="color:#888780;text-align:center;font-style:italic;width:100%;">No category breakdown data available for this year.</div>`;
+      return;
+    }
+
+    let maxIdx = -1, minIdx = -1;
+    let maxVal = -1, minVal = Infinity;
+
+    for (let i = 0; i < this.data.length; i++) {
+      const val = this.data[i];
+      if (val > 0) {
+        if (val > maxVal) {
+          maxVal = val;
+          maxIdx = i;
+        }
+        if (val < minVal) {
+          minVal = val;
+          minIdx = i;
+        }
+      }
+    }
+
+    if (maxIdx === -1) {
+      this.summaryEl.innerHTML = '';
+      return;
+    }
+
+    const maxLabel = this.labels[maxIdx];
+    const maxColor = this.colors[maxIdx];
+    const maxPct = ((maxVal / total) * 100).toFixed(0);
+
+    let html = `
+      <div style="flex:1;background:rgba(227,73,72,0.06);border:1px solid rgba(227,73,72,0.12);border-radius:10px;padding:8px 10px;">
+        <span style="font-weight:700;color:#e34948;display:flex;align-items:center;gap:4px;"><span style="font-size:14px;">🔥</span> Most Spent:</span>
+        <div style="margin-top:4px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${maxColor};"></span>
+          <span>${maxLabel} (₹${Math.round(maxVal).toLocaleString()})</span>
+          <span style="color:#888780;font-size:11px;font-weight:500;">${maxPct}% of total</span>
+        </div>
+      </div>
+    `;
+
+    if (minIdx !== -1 && minIdx !== maxIdx) {
+      const minLabel = this.labels[minIdx];
+      const minColor = this.colors[minIdx];
+      const minPct = ((minVal / total) * 100).toFixed(0);
+      html += `
+        <div style="flex:1;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.12);border-radius:10px;padding:8px 10px;">
+          <span style="font-weight:700;color:#10b981;display:flex;align-items:center;gap:4px;"><span style="font-size:14px;">🏆</span> Least Spent:</span>
+          <div style="margin-top:4px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${minColor};"></span>
+            <span>${minLabel} (₹${Math.round(minVal).toLocaleString()})</span>
+            <span style="color:#888780;font-size:11px;font-weight:500;">${minPct}% of total</span>
+          </div>
+        </div>
+      `;
+    }
+
+    this.summaryEl.innerHTML = html;
+  }
+}
+
 function renderChartsFromData(totals, budgets, catData){
-  if(A.barChart)A.barChart.destroy();
-  A.barChart=new Chart(document.getElementById('chart-bar'),{
-    type:'bar',
-    data:{labels:MN.map(m=>m.slice(0,3)),datasets:[
-      {label:'Budget',data:MN.map((_,i)=>budgets[i]||0),backgroundColor:'#B5D4F4',borderWidth:0,borderRadius:4},
-      {label:'Spent',data:MN.map((_,i)=>Math.round(totals[i]||0)),backgroundColor:'#2a78d6',borderWidth:0,borderRadius:4}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v},grid:{color:'rgba(0,0,0,0.04)'}}}}
-  });
-  if(A.pieChart)A.pieChart.destroy();
-  const pd=CATS.map(c=>Math.round(catData[c]));
-  const hasData=pd.some(v=>v>0);
-  A.pieChart=new Chart(document.getElementById('chart-pie'),{
-    type:'doughnut',
-    data:{labels:CATS,datasets:[{data:hasData?pd:[1],backgroundColor:hasData?CATS.map(c=>CC[c]):['#e8e6de'],borderWidth:2,borderColor:'#fff'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
-  });
+  if(A.barChart && typeof A.barChart.destroy === 'function') {
+    A.barChart.destroy();
+  }
+  const barCanvas = document.getElementById('chart-bar');
+  A.barChart = new ThreeDBarChart(barCanvas, totals, budgets);
+
+  if(A.pieChart && typeof A.pieChart.destroy === 'function') {
+    A.pieChart.destroy();
+  }
+  const pieCanvas = document.getElementById('chart-pie');
+  const pd = CATS.map(c => Math.round(catData[c]));
+  const pieColors = CATS.map(c => CC[c]);
+  A.pieChart = new ThreeDPieChart(pieCanvas, CATS, pd, pieColors);
 }
 
 /* ════════════════════════════════════════════
@@ -2405,7 +3490,8 @@ function calY(d){
   A.currentYear+=d;
   document.getElementById('cal-yr').textContent=A.currentYear;
   document.getElementById('yr-display').textContent=A.currentYear;
-  renderCalGrid();renderMonthsGrid();
+  localStorage.setItem('budget_detector_current_year', A.currentYear);
+  renderCalGrid();renderDash();
 }
 
 /* ════════════════════════════════════════════
@@ -2434,9 +3520,16 @@ const SUPABASE_URL = 'https://ywkqegaparzgvthaomjr.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3a3FlZ2FwYXJ6Z3Z0aGFvbWpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1OTI4NDMsImV4cCI6MjA5ODE2ODg0M30.lqtESeWacDuWS-zXRh83DaP9SnjaugoNbhRRsOLobM0';
 
 async function startup(){
+  try {
+    document.getElementById('debug-url').textContent = "Current File / URL: " + window.location.href;
+  } catch(e) {}
   showLoad('Connecting to database…');
-  // Always connect using hardcoded credentials — works on every device automatically
-  const ok = initSupabase(SUPABASE_URL, SUPABASE_KEY);
+  // Check if user has saved credentials in localStorage first, fallback to hardcoded
+  const savedUrl = localStorage.getItem('sb_url');
+  const savedKey = localStorage.getItem('sb_key');
+  const url = savedUrl || SUPABASE_URL;
+  const key = savedKey || SUPABASE_KEY;
+  const ok = initSupabase(url, key);
   if(ok){
     try{
       // Check if user is already logged in on this device
@@ -2815,6 +3908,240 @@ var CatchGame = {
   }
 };
 
+/* ════════════════════════════════════════════
+   ONBOARDING TUTORIAL TOUR ENGINE
+   ════════════════════════════════════════════ */
+let currentTutorialStep = 0;
+let tutorialTimer = null;
+const tutorialSteps = [
+  {
+    targetId: 'btn-set-budget',
+    title: 'Set Monthly Budget',
+    body: 'Click here to set your spending limit for the month. This budget will be divided into three 10-day periods with automatic smart alerts.'
+  },
+  {
+    targetId: 'btn-calendar',
+    title: 'Calendar & Year Navigation',
+    body: 'Use this calendar button and the adjacent year switcher to navigate between years and months. Click it to open the month selector.'
+  },
+  {
+    targetId: 'card-budget',
+    title: 'Monthly Budget Limit',
+    body: 'Displays your monthly grocery budget limit. When no budget is set, it will gently remind you to set one.'
+  },
+  {
+    targetId: 'card-spent',
+    title: 'Total Spend Tracker',
+    body: 'Shows the sum of all transactions logged this month across all categories so you know how much you\'ve spent.'
+  },
+  {
+    targetId: 'card-remaining',
+    title: 'Remaining Balance',
+    body: 'Shows the remaining balance of your monthly budget. If you overspend, this card will turn red to alert you!'
+  },
+  {
+    targetId: 'card-utilization',
+    title: 'Budget Utilization',
+    body: 'Displays your budget utilization rate visually via a colored progress bar (green, yellow, or red based on consumption velocity).'
+  },
+  {
+    targetId: 'dash-charts-container',
+    title: '3D Spending Analytics',
+    body: 'Interactive 3D charts for insights! Drag to rotate them, hover over bars or slices to see details, and review the top spending categories.'
+  }
+];
+
+function startTutorial(force = false) {
+  const userId = uid() || 'guest';
+  if (!force && localStorage.getItem('seen_tutorial_' + userId) === 'true') {
+    return;
+  }
+  
+  // Only play if the dashboard page is currently active
+  if (!document.getElementById('pg-dashboard').classList.contains('active')) {
+    return;
+  }
+
+  currentTutorialStep = 0;
+  document.getElementById('tutorial-overlay').classList.add('active');
+  showTutorialStep(0);
+}
+
+function showTutorialStep(index) {
+  // Clear any existing highlighted element
+  document.querySelectorAll('.tutorial-highlight').forEach(el => {
+    el.classList.remove('tutorial-highlight');
+  });
+
+  if (index < 0 || index >= tutorialSteps.length) {
+    endTutorial(true);
+    return;
+  }
+
+  currentTutorialStep = index;
+  const step = tutorialSteps[index];
+  const target = document.getElementById(step.targetId);
+
+  if (!target) {
+    // If target is missing (e.g. elements not fully rendered), skip it
+    nextTutorialStep();
+    return;
+  }
+
+  // Update tutorial dialog contents
+  document.getElementById('tutorial-step-indicator').textContent = `${index + 1} / ${tutorialSteps.length}`;
+  document.getElementById('tutorial-body').innerHTML = `
+    <div style="font-weight: 700; font-size: 14.5px; color: #1a1a18; margin-bottom: 6px;">${step.title}</div>
+    <div>${step.body}</div>
+  `;
+
+  // Enable/disable navigation buttons appropriately
+  document.getElementById('tutorial-btn-prev').disabled = index === 0;
+  
+  const nextBtn = document.getElementById('tutorial-btn-next');
+  if (index === tutorialSteps.length - 1) {
+    nextBtn.textContent = 'Finish';
+  } else {
+    nextBtn.textContent = 'Next';
+  }
+
+  // Scroll the target element into view smoothly before positioning
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // Add highlight to target element
+  target.classList.add('tutorial-highlight');
+
+  // Trigger positioning after a tiny delay for scroll completion
+  setTimeout(() => {
+    positionTutorialBox(target);
+  }, 250);
+
+  // Manage progress bar animation (5 seconds)
+  const bar = document.getElementById('tutorial-progress-bar');
+  bar.style.transition = 'none';
+  bar.style.transform = 'scaleX(0)';
+  void bar.offsetWidth; // force browser layout reflow
+  bar.style.transition = 'transform 5000ms linear';
+  bar.style.transform = 'scaleX(1)';
+
+  // Set the 5-second automatic progression timer
+  if (tutorialTimer) clearTimeout(tutorialTimer);
+  tutorialTimer = setTimeout(() => {
+    nextTutorialStep();
+  }, 5000);
+}
+
+function positionTutorialBox(target) {
+  const box = document.getElementById('tutorial-box');
+  const arrow = document.getElementById('tutorial-arrow');
+  if (!box || !target) return;
+
+  const rect = target.getBoundingClientRect();
+  const boxWidth = box.offsetWidth || 320;
+  const boxHeight = box.offsetHeight || 150;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  let position = 'bottom';
+  
+  // Decide top/bottom placement based on screen position
+  if (rect.top + rect.height / 2 > viewportHeight / 2) {
+    position = 'top';
+  }
+
+  // Calculate left position (centered on target but bounded inside the viewport)
+  let left = rect.left + rect.width / 2 - boxWidth / 2;
+  left = Math.max(10, Math.min(viewportWidth - boxWidth - 10, left));
+
+  let top = 0;
+  if (position === 'bottom') {
+    top = rect.bottom + window.scrollY + 12;
+    arrow.style.borderWidth = '0 8px 8px 8px';
+    arrow.style.borderColor = 'transparent transparent #ffffff transparent';
+    arrow.style.top = '-8px';
+    arrow.style.bottom = 'auto';
+  } else {
+    top = rect.top + window.scrollY - boxHeight - 12;
+    arrow.style.borderWidth = '8px 8px 0 8px';
+    arrow.style.borderColor = '#ffffff transparent transparent transparent';
+    arrow.style.top = 'auto';
+    arrow.style.bottom = '-8px';
+  }
+
+  // Position arrow horizontally relative to target center
+  let arrowLeft = rect.left + rect.width / 2 - left - 8;
+  arrowLeft = Math.max(15, Math.min(boxWidth - 25, arrowLeft));
+  arrow.style.left = arrowLeft + 'px';
+
+  box.style.top = top + 'px';
+  box.style.left = left + 'px';
+}
+
+function nextTutorialStep() {
+  showTutorialStep(currentTutorialStep + 1);
+}
+
+function prevTutorialStep() {
+  if (currentTutorialStep > 0) {
+    showTutorialStep(currentTutorialStep - 1);
+  }
+}
+
+function skipTutorial() {
+  endTutorial(false);
+}
+
+function endTutorial(completed) {
+  if (tutorialTimer) clearTimeout(tutorialTimer);
+  
+  // Hide overlay
+  document.getElementById('tutorial-overlay').classList.remove('active');
+  
+  // Clear highlighted styles
+  document.querySelectorAll('.tutorial-highlight').forEach(el => {
+    el.classList.remove('tutorial-highlight');
+  });
+
+  const userId = uid() || 'guest';
+  if (completed) {
+    localStorage.setItem('seen_tutorial_' + userId, 'true');
+  }
+}
+
+// Adjust tutorial popup position on window resize/scroll to avoid misalignment
+window.addEventListener('resize', () => {
+  if (document.getElementById('tutorial-overlay').classList.contains('active')) {
+    const step = tutorialSteps[currentTutorialStep];
+    const target = document.getElementById(step.targetId);
+    if (target) positionTutorialBox(target);
+  }
+});
+
 </script>
+
+<!-- ═══════════ ONBOARDING TUTORIAL TOUR ═══════════ -->
+<div id="tutorial-overlay" class="tutorial-overlay">
+  <div id="tutorial-box" class="tutorial-box">
+    <div class="tutorial-header">
+      <span class="tutorial-title"><i class="ti ti-info-circle"></i> Quick Tour</span>
+      <span class="tutorial-step-indicator" id="tutorial-step-indicator">1 / 7</span>
+    </div>
+    <div class="tutorial-body" id="tutorial-body">
+      <!-- Dynamic step content will be inserted here -->
+    </div>
+    <div class="tutorial-progress-bar-container">
+      <div class="tutorial-progress-bar" id="tutorial-progress-bar"></div>
+    </div>
+    <div class="tutorial-footer">
+      <button class="btn btn-sm btn-outline" id="tutorial-btn-skip" onclick="skipTutorial()" style="padding:4px 10px;font-size:12px">Skip</button>
+      <div class="tutorial-nav-buttons">
+        <button class="btn btn-sm" id="tutorial-btn-prev" onclick="prevTutorialStep()" style="padding:4px 10px;font-size:12px">Back</button>
+        <button class="btn btn-primary btn-sm" id="tutorial-btn-next" onclick="nextTutorialStep()" style="padding:4px 12px;font-size:12px">Next</button>
+      </div>
+    </div>
+    <div class="tutorial-arrow" id="tutorial-arrow"></div>
+  </div>
+</div>
+
 </body>
 </html>
