@@ -22,7 +22,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f1efe8;color:#1a
 .btn-sm{padding:5px 13px;font-size:12px}
 .btn-outline{background:#fff;border:1.5px solid #2a78d6;color:#2a78d6}
 .btn-outline:hover{background:#E6F1FB;transform:translateY(-2px);box-shadow:0 4px 12px rgba(42,120,214,0.08)}
-.inp{width:100%;padding:11px 14px;border:1.5px solid rgba(0,0,0,.12);border-radius:10px;background:#fff;color:#1a1a18;font-size:14px;font-family:inherit;transition:all .2s ease;-moz-appearance:textfield}
+.inp{width:100%;padding:11px 14px;border:1.5px solid rgba(0,0,0,.12);border-radius:10px;background:#fff;color:#1a1a18;font-size:14px;font-family:inherit;transition:all .2s ease;-moz-appearance:textfield;appearance:textfield;}
 .inp::-webkit-outer-spin-button,.inp::-webkit-inner-spin-button{-webkit-appearance:none}
 .inp:focus{outline:none;border-color:#2a78d6;box-shadow:0 0 0 4px rgba(42,120,214,.12);transform:translateY(-1px)}
 select.inp{cursor:pointer}
@@ -200,7 +200,7 @@ select.inp{cursor:pointer}
 .d-group{margin-bottom:18px}
 .amt-wrap{position:relative}
 .amt-pre{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:20px;font-weight:700;color:#4a6fa8;pointer-events:none}
-.amt-inp-dark{width:100%;padding:12px 16px 12px 36px;border:1.5px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.07);color:#e8f0fe;font-size:26px;font-weight:700;-moz-appearance:textfield;transition:border-color .15s;font-family:inherit}
+.amt-inp-dark{width:100%;padding:12px 16px 12px 36px;border:1.5px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.07);color:#e8f0fe;font-size:26px;font-weight:700;-moz-appearance:textfield;appearance:textfield;transition:border-color .15s;font-family:inherit}
 .amt-inp-dark::-webkit-outer-spin-button,.amt-inp-dark::-webkit-inner-spin-button{-webkit-appearance:none}
 .amt-inp-dark:focus{outline:none;border-color:#5b8dee;background:rgba(255,255,255,.1)}
 .amt-inp-dark::placeholder{color:#3a4d72}
@@ -214,7 +214,7 @@ select.inp{cursor:pointer}
 /* Light modal inputs */
 .l-label{font-size:12px;color:#5f5e5a;margin-bottom:5px;display:block;font-weight:700}
 .l-group{margin-bottom:14px}
-.amt-inp-light{width:100%;padding:12px 16px 12px 36px;border:1.5px solid rgba(0,0,0,.15);border-radius:12px;background:#f5f4f0;color:#1a1a18;font-size:26px;font-weight:700;-moz-appearance:textfield;transition:all .15s;font-family:inherit}
+.amt-inp-light{width:100%;padding:12px 16px 12px 36px;border:1.5px solid rgba(0,0,0,.15);border-radius:12px;background:#f5f4f0;color:#1a1a18;font-size:26px;font-weight:700;-moz-appearance:textfield;appearance:textfield;transition:all .15s;font-family:inherit}
 .amt-inp-light::-webkit-outer-spin-button,.amt-inp-light::-webkit-inner-spin-button{-webkit-appearance:none}
 .amt-inp-light:focus{outline:none;border-color:#2a78d6;background:#fff;box-shadow:0 0 0 3px rgba(42,120,214,.1)}
 .amt-inp-light::placeholder{color:#b4b2a9}
@@ -801,6 +801,13 @@ select.inp{cursor:pointer}
   .feat-grid {
     grid-template-columns: 1fr !important;
   }
+  #chart-pie-summary {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  canvas {
+    max-width: 100% !important;
+  }
 }
 
 .months-grid-responsive {
@@ -1072,6 +1079,17 @@ serve(async (req) =&gt; {
         </div>
         <button class="btn btn-primary" style="width:100%;padding:11px;font-size:14px;border-radius:10px" id="login-btn" onclick="doLogin()">Log in</button>
         <span class="err-msg" id="login-err"></span>
+
+        <div style="display:flex;align-items:center;margin:14px 0;color:#888780;font-size:12px">
+          <div style="flex:1;height:1px;background:rgba(0,0,0,0.08)"></div>
+          <span style="margin:0 10px;font-weight:500">or</span>
+          <div style="flex:1;height:1px;background:rgba(0,0,0,0.08)"></div>
+        </div>
+
+        <button class="btn" id="google-login-btn" style="width:100%;padding:11px;font-size:14px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="doGoogleLogin('login-err', 'google-login-btn')">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7l2.86 2.22c1.67-1.54 2.63-3.8 2.63-6.55z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.86-2.22C11.3 14.12 10.22 14.4 9 14.4c-2.34 0-4.32-1.58-5.03-3.7L1.03 12.9C2.52 15.88 5.6 18 9 18z" fill="#34A853"/><path d="M3.97 10.7C3.79 10.18 3.7 9.61 3.7 9s.09-1.18.27-1.7L1.03 5.08C.37 6.26 0 7.6 0 9s.37 2.74 1.03 3.92l2.94-2.22z" fill="#FBBC05"/><path d="M9 3.6c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0 5.6 0 2.52 2.12 1.03 5.08l2.94 2.22C4.68 5.18 6.66 3.6 9 3.6z" fill="#EA4335"/></svg>
+          Continue with Google
+        </button>
       </div>
       <!-- REGISTER -->
       <div id="auth-register" class="hidden">
@@ -1082,6 +1100,17 @@ serve(async (req) =&gt; {
         <div class="form-group"><label class="form-label">Confirm password</label><input class="inp" type="password" id="reg-pw2" placeholder="Repeat password" onkeydown="if(event.key==='Enter')doRegister()"></div>
         <button class="btn btn-primary" style="width:100%;padding:11px;font-size:14px;border-radius:10px;margin-top:4px" id="register-btn" onclick="doRegister()">Create account</button>
         <span class="err-msg" id="reg-err"></span>
+
+        <div style="display:flex;align-items:center;margin:14px 0;color:#888780;font-size:12px">
+          <div style="flex:1;height:1px;background:rgba(0,0,0,0.08)"></div>
+          <span style="margin:0 10px;font-weight:500">or</span>
+          <div style="flex:1;height:1px;background:rgba(0,0,0,0.08)"></div>
+        </div>
+
+        <button class="btn" id="google-reg-btn" style="width:100%;padding:11px;font-size:14px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="doGoogleLogin('reg-err', 'google-reg-btn')">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7l2.86 2.22c1.67-1.54 2.63-3.8 2.63-6.55z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.86-2.22C11.3 14.12 10.22 14.4 9 14.4c-2.34 0-4.32-1.58-5.03-3.7L1.03 12.9C2.52 15.88 5.6 18 9 18z" fill="#34A853"/><path d="M3.97 10.7C3.79 10.18 3.7 9.61 3.7 9s.09-1.18.27-1.7L1.03 5.08C.37 6.26 0 7.6 0 9s.37 2.74 1.03 3.92l2.94-2.22z" fill="#FBBC05"/><path d="M9 3.6c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0 5.6 0 2.52 2.12 1.03 5.08l2.94 2.22C4.68 5.18 6.66 3.6 9 3.6z" fill="#EA4335"/></svg>
+          Continue with Google
+        </button>
       </div>
     </div>
     <!-- Supabase auto-connects — no manual setup needed -->
@@ -1158,9 +1187,9 @@ serve(async (req) =&gt; {
 <!-- ═══════════ MONTH PAGE ═══════════ -->
 <div id="pg-month" class="page">
   <div class="nav nav-dark">
-    <button class="back-btn" onclick="showPage('pg-dashboard');renderDash()">
+    <button class="back-btn" onclick="renderDash()">
       <span class="back-arrow"><i class="ti ti-arrow-left" style="font-size:13px"></i></span>
-      <span>Dashboard</span>
+      <span>Back</span>
     </button>
     <span class="logo">Budget <span>Detector</span></span>
     <div id="month-budget-tag" style="font-size:13px;color:#94a3c4;background:rgba(255,255,255,.08);padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.12);white-space:nowrap"></div>
@@ -1543,6 +1572,35 @@ async function doRegister(){
   }
 }
 
+async function doGoogleLogin(errId = 'login-err', btnId = 'google-login-btn') {
+  const err = document.getElementById(errId);
+  if (err) err.textContent = '';
+  if(!A.sb){
+    if (err) err.textContent = 'Not connected to database. Please set up Supabase first.';
+    return;
+  }
+  const btn = document.getElementById(btnId);
+  let oldContent = '';
+  if (btn) {
+    oldContent = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Connecting...';
+  }
+  const { error } = await A.sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin
+    }
+  });
+  if (error) {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = oldContent;
+    }
+    if (err) err.textContent = error.message;
+  }
+}
+
 async function doLogin(){
   const email=document.getElementById('login-email').value.trim().toLowerCase();
   const pw=document.getElementById('login-pw').value;
@@ -1817,7 +1875,70 @@ async function allMonthBudgets(y){
    ALERT LOGIC
 ════════════════════════════════════════════ */
 function curPeriod(){const d=new Date().getDate();return d<=10?1:d<=20?2:3;}
-function periodLimit(budget,p,m,y){const f=Math.floor(budget/3);return p===3?budget-f*2:f;}
+function periodLimit(budget,p,m,y){
+  const f=Math.floor(budget/3);
+  const baseLimit = p===3?budget-f*2:f;
+  const key = `budget_adjustments_${uid()||'local'}_${y}_${m}`;
+  const adjStr = localStorage.getItem(key);
+  if(adjStr){
+    try {
+      const adj = JSON.parse(adjStr);
+      if(p === 2) return baseLimit + (adj.p2 || 0);
+      if(p === 3) return baseLimit + (adj.p3 || 0);
+      if(p === 1) return baseLimit + (adj.p1 || 0);
+    } catch(e) {}
+  }
+  return baseLimit;
+}
+
+async function checkP1Adjustment(y, m) {
+  const budget = await getBudget(y, m);
+  if (!budget) return;
+
+  const now = new Date();
+  const isCurrentMonth = (now.getFullYear() === y && now.getMonth() === m);
+  const isPastMonth = (y < now.getFullYear() || (y === now.getFullYear() && m < now.getMonth()));
+  
+  if (isCurrentMonth && now.getDate() < 11) return; // Period 1 is still ongoing
+  if (!isCurrentMonth && !isPastMonth) return; // Future month
+  
+  const userSuffix = uid() || 'local';
+  const decisionKey = `p1_decision_${userSuffix}_${y}_${m}`;
+  if (localStorage.getItem(decisionKey)) return; // Already decided
+  
+  // Calculate Period 1 spent and limit
+  const txs = await getTxs(y, m);
+  const baseLimit = Math.floor(budget / 3);
+  const spent = getPeriodSpent(txs, 1, dim(m, y));
+  const diff = baseLimit - spent; // positive = profit, negative = loss
+  
+  if (Math.round(diff) === 0) return; // Ignore tiny fractional differences
+  
+  const absDiff = Math.abs(diff);
+  const half = Math.round(absDiff / 2);
+  
+  if (diff > 0) {
+    // Profit
+    const yes = confirm(`We made a profit of ₹${Math.round(absDiff).toLocaleString()} in Period 1. Shall we split it into Period 2 and Period 3?`);
+    if (yes) {
+      const adjKey = `budget_adjustments_${userSuffix}_${y}_${m}`;
+      localStorage.setItem(adjKey, JSON.stringify({ p1: 0, p2: half, p3: half }));
+      localStorage.setItem(decisionKey, 'yes');
+    } else {
+      localStorage.setItem(decisionKey, 'no');
+    }
+  } else {
+    // Loss
+    const yes = confirm(`We made a loss of ₹${Math.round(absDiff).toLocaleString()} in Period 1. Adjust it from Period 2 and Period 3?`);
+    if (yes) {
+      const adjKey = `budget_adjustments_${userSuffix}_${y}_${m}`;
+      localStorage.setItem(adjKey, JSON.stringify({ p1: 0, p2: -half, p3: -half }));
+      localStorage.setItem(decisionKey, 'yes');
+    } else {
+      localStorage.setItem(decisionKey, 'no');
+    }
+  }
+}
 
 /*
   SMART ALERT TIERS — percentage OVER the period's split budget limit
@@ -1945,6 +2066,7 @@ async function renderDash(){
   showLoad('Loading dashboard…');
   
   try {
+    await checkP1Adjustment(y, m);
     // 1. Fetch all data for the year and current month in parallel
     const [txsRes, budgetsRes, currTxs] = await Promise.all([
       A.sb ? A.sb.from('transactions').select('month,category,amount').eq('user_id',uid()).eq('year',y) : Promise.resolve({data:[]}),
@@ -2146,9 +2268,9 @@ class ThreeDBarChart {
   }
 
   resize() {
-    const rect = this.canvas.parentElement.getBoundingClientRect();
-    const w = rect.width || 400;
-    const h = rect.height || 260;
+    const parent = this.canvas.parentElement;
+    const w = parent.clientWidth || 300;
+    const h = parent.clientHeight || 260;
     
     if (this.width !== w || this.height !== h) {
       this.width = w;
@@ -2544,9 +2666,9 @@ class ThreeDPieChart {
   }
 
   resize() {
-    const rect = this.canvas.parentElement.getBoundingClientRect();
-    const w = rect.width || 400;
-    const h = rect.height || 260;
+    const parent = this.canvas.parentElement;
+    const w = parent.clientWidth || 300;
+    const h = parent.clientHeight || 260;
 
     if (this.width !== w || this.height !== h) {
       this.width = w;
@@ -3030,68 +3152,85 @@ function renderChartsFromData(totals, budgets, catData){
 ════════════════════════════════════════════ */
 async function checkAndNotifyAlert(y,m){
   if(!A.sb||!uid())return;
-  const al = await getAlert(y,m);
-  // Send email for orange, yellow AND red (all 3 alert tiers)
-  // Skip only green (within budget) and info (no budget set yet)
-  if(al.type==='info'||al.type==='green')return;
+  const budget=await getBudget(y,m);
+  if(!budget)return;
+  const txs=await getTxs(y,m);
+  const days=dim(m,y);
 
-  // Track last-notified tier per user/year/month/period in localStorage
-  // to avoid spamming — only send when tier ESCALATES (orange→yellow→red)
-  // orange=1, yellow=2, red=3
-  const tierRank={orange:1,yellow:2,red:3};
-  const notifyKey = 'alertNotified_'+uid()+'_'+y+'_'+m+'_'+al.period;
-  const lastTier = localStorage.getItem(notifyKey);
-  const lastRank = lastTier ? tierRank[lastTier] : 0;
-  const curRank  = tierRank[al.type];
+  for (let p = 1; p <= 3; p++) {
+    const periodLabel=p===1?'Day 1–10':p===2?'Day 11–20':('Day 21–'+days);
+    const limit=periodLimit(budget,p,m,y);
+    const spent=getPeriodSpent(txs,p,days);
+    const over=spent-limit;
+    const pctOver=periodPct(spent,limit);
 
-  // Only send when escalating to a NEW higher tier
-  // (prevents same-tier email spam on every transaction)
-  if(curRank<=lastRank) return;
+    let type = 'green';
+    if(pctOver<=0){
+      type = 'green';
+    } else if(pctOver<=12.5){
+      type = 'green';
+    } else if(pctOver<=25){
+      type = 'orange';
+    } else if(pctOver<=37.5){
+      type = 'yellow';
+    } else {
+      type = 'red';
+    }
 
-  localStorage.setItem(notifyKey, al.type);
+    if (type === 'green') continue;
 
-  // Log the alert to the database (audit trail), then attempt to email it
-  try{
-    await A.sb.from('alert_logs').insert({
-      user_id: uid(),
-      year: y, month: m, period: al.period,
-      alert_type: al.type,
-      message: al.msg,
-      email_sent_to: A.user.email
-    });
-  }catch(e){
-    console.warn('Alert log insert failed (non-blocking):',e);
-  }
+    const tierRank={orange:1,yellow:2,red:3};
+    const notifyKey = 'alertNotified_'+uid()+'_'+y+'_'+m+'_'+p;
+    const lastTier = localStorage.getItem(notifyKey);
+    const lastRank = lastTier ? tierRank[lastTier] : 0;
+    const curRank  = tierRank[type];
 
-  // Build tier-specific subject prefix
-  const tierPrefix = al.type==='orange'
-    ? '⚠️ Orange Alert'
-    : al.type==='yellow'
-    ? '🟡 Yellow Alert'
-    : '🚨 Red Alert';
+    if(curRank<=lastRank) continue;
 
-  try{
-    await A.sb.functions.invoke('send-budget-alert',{
-      body:{
-        to: A.user.email,
-        name: A.profile?.full_name || A.user.email,
-        alertType: al.type,
-        tierPrefix,
-        message: al.msg,
-        month: MN[m],
-        year: y,
-        period: al.period,
-        periodLabel: al.period===1?'Day 1–10':al.period===2?'Day 11–20':'Day 21–'+dim(m,y),
-        spent: Math.round(al.spent),
-        limit: Math.round(al.limit),
-        over: Math.round(al.over),
-        pctOver: al.pctOver.toFixed(1)
-      }
-    });
-    console.log('Alert email sent:',al.type,'for period',al.period);
-  }catch(e){
-    // Edge Function may not be deployed yet — alerts still work inside the app
-    console.warn('Email notification (non-blocking):',e.message);
+    localStorage.setItem(notifyKey, type);
+
+    const tierPrefix = type==='orange'
+      ? '⚠️ Orange Alert'
+      : type==='yellow'
+      ? '🟡 Yellow Alert'
+      : '🚨 Red Alert';
+
+    const alertMsg = `${tierPrefix}! You've spent ${pctOver.toFixed(1)}% over your ${periodLabel} limit (₹${Math.round(over).toLocaleString()} extra).`;
+
+    try{
+      await A.sb.from('alert_logs').insert({
+        user_id: uid(),
+        year: y, month: m, period: p,
+        alert_type: type,
+        message: alertMsg,
+        email_sent_to: A.user.email
+      });
+    }catch(e){
+      console.warn('Alert log insert failed (non-blocking):',e);
+    }
+
+    try{
+      await A.sb.functions.invoke('send-budget-alert',{
+        body:{
+          to: A.user.email,
+          name: A.profile?.full_name || A.user.email,
+          alertType: type,
+          tierPrefix,
+          message: alertMsg,
+          month: MN[m],
+          year: y,
+          period: p,
+          periodLabel,
+          spent: Math.round(spent),
+          limit: Math.round(limit),
+          over: Math.round(over),
+          pctOver: pctOver.toFixed(1)
+        }
+      });
+      console.log('Alert email sent:',type,'for period',p);
+    }catch(e){
+      console.warn('Email notification (non-blocking):',e.message);
+    }
   }
 }
 
@@ -3148,6 +3287,9 @@ async function saveBudget(){
   }
   // Reset notification memory for this month — new budget means new limits to evaluate
   ['1','2','3'].forEach(p=>localStorage.removeItem('alertNotified_'+uid()+'_'+y+'_'+m+'_'+p));
+  const userSuffix = uid() || 'local';
+  localStorage.removeItem(`budget_adjustments_${userSuffix}_${y}_${m}`);
+  localStorage.removeItem(`p1_decision_${userSuffix}_${y}_${m}`);
   checkAndNotifyAlert(y,m);
 }
 
@@ -3161,6 +3303,7 @@ async function openMonth(y,m){
   document.getElementById('search-inp').value='';
   document.getElementById('filter-cat').value='';
   showLoad('Loading '+MN[m]+'…');
+  await checkP1Adjustment(y, m);
   const budget=await getBudget(y,m);
   document.getElementById('month-budget-tag').textContent=budget?'Budget ₹'+budget.toLocaleString():'No budget set';
   document.getElementById('month-budget-prompt').classList.toggle('hidden',!!budget);
@@ -3347,6 +3490,12 @@ async function renderDates(){
         <button class="btn btn-sm" onclick="openEditTx(${d},'${t.id}')" style="padding:3px 8px;font-size:11px" title="Edit"><i class="ti ti-edit"></i></button>
         <button class="btn btn-danger" onclick="doDeleteTx(${d},'${t.id}')" title="Delete"><i class="ti ti-trash"></i></button>
       </div>`).join('');
+
+    const now = new Date();
+    const isFuture = (y > now.getFullYear()) ||
+                     (y === now.getFullYear() && m > now.getMonth()) ||
+                     (y === now.getFullYear() && m === now.getMonth() && d > now.getDate());
+
     block.innerHTML=`
     <div class="date-hdr" onclick="toggleDate(this)" id="hdr-${d}">
       <div style="display:flex;align-items:center;gap:10px">
@@ -3354,12 +3503,14 @@ async function renderDates(){
         <span style="font-size:12px;color:#888780">${dow}</span>
         ${raw.length>0
           ? `<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:#E1F5EE;color:#0F6E56;font-weight:600">${raw.length} tx</span>`
+          : isFuture
+          ? `<span style="font-size:11px;color:#b4b2a9;font-style:italic">not reached</span>`
           : `<span style="font-size:11px;color:#b4b2a9;font-style:italic">tap to add</span>`
         }
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         ${dayTotal>0?`<span style="font-size:14px;font-weight:700;color:#2a78d6">₹${Math.round(dayTotal).toLocaleString()}</span>`:''}
-        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openAddTx(${d})" style="border-radius:20px;padding:4px 12px">+ Add</button>
+        ${isFuture ? '' : `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openAddTx(${d})" style="border-radius:20px;padding:4px 12px">+ Add</button>`}
         <i class="ti ti-chevron-down" id="chev-${d}" style="color:#888780;font-size:14px;transition:transform .2s"></i>
       </div>
     </div>
@@ -3419,6 +3570,14 @@ function toggleDate(h){
    TRANSACTION MODAL
 ════════════════════════════════════════════ */
 function openAddTx(day){
+  const now = new Date();
+  const isFuture = (A.currentYear > now.getFullYear()) ||
+                   (A.currentYear === now.getFullYear() && A.currentMonth > now.getMonth()) ||
+                   (A.currentYear === now.getFullYear() && A.currentMonth === now.getMonth() && day > now.getDate());
+  if (isFuture) {
+    alert("Cannot add transactions for future dates.");
+    return;
+  }
   A.editTxId=null;A.editDay=day;
   document.getElementById('tx-title').textContent='Add — '+day+' '+MN[A.currentMonth].slice(0,3)+' '+A.currentYear;
   document.getElementById('tx-amt').value='';
