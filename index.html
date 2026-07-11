@@ -3583,7 +3583,6 @@ function openAddTx(day){
   document.getElementById('tx-amt').value='';
   document.getElementById('tx-desc').value='';
   document.getElementById('tx-amt-err').textContent='';
-  const now=new Date();
   document.getElementById('tx-time').value=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
   A.selCat='Grocery';renderPills('Grocery');
   document.getElementById('m-tx').classList.remove('hidden');
