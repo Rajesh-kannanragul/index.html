@@ -791,15 +791,12 @@ select.inp{cursor:pointer}
 
 /* ── Mobile Responsive Overrides ── */
 @media (max-width: 768px) {
-  .g2, .g3, .g4 {
+  .charts-grid {
     grid-template-columns: 1fr !important;
     gap: 12px !important;
   }
-  .months-grid-responsive {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  .feat-grid {
-    grid-template-columns: 1fr !important;
+  .nav-dark .logo {
+    display: none !important;
   }
   #chart-pie-summary {
     flex-direction: column !important;
@@ -1158,7 +1155,7 @@ serve(async (req) =&gt; {
     </div>
     <div id="months-grid" class="months-grid-responsive" style="margin-bottom:28px"></div>
     <div style="font-size:15px;font-weight:700;margin-bottom:12px">Spending analytics</div>
-    <div class="g2" style="margin-bottom:40px">
+    <div class="g2 charts-grid" style="margin-bottom:40px">
       <div class="card" style="position:relative; overflow:visible;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
           <div style="font-size:13px;font-weight:600;color:#5f5e5a">Budget vs Total spending</div>
@@ -1234,7 +1231,7 @@ serve(async (req) =&gt; {
         <button class="calc-btn-header" onclick="toggleCalc()" id="calc-toggle-btn" title="Open Calculator">
           🧮 Calc
         </button>
-        <button class="modal-close-dark" onclick="closeModal('m-tx')">×</button>
+        <button class="modal-close-dark" onclick="closeModal('m-tx')"><i class="ti ti-x"></i></button>
       </div>
     </div>
     <div class="modal-body">
@@ -1305,7 +1302,7 @@ serve(async (req) =&gt; {
   <div class="modal-light">
     <div class="modal-hdr-light">
       <span class="modal-title-light" id="budget-modal-title">Set your grocery budget</span>
-      <button class="modal-close-light" onclick="closeModal('m-budget')">×</button>
+      <button class="modal-close-light" onclick="closeModal('m-budget')"><i class="ti ti-x"></i></button>
     </div>
     <div class="modal-body">
       <div style="background:#E6F1FB;border-radius:10px;padding:13px 15px;margin-bottom:18px;font-size:13px;color:#185FA5;line-height:1.65">
@@ -1334,7 +1331,7 @@ serve(async (req) =&gt; {
   <div class="modal-light" style="width:min(420px,94vw)">
     <div class="modal-hdr-light">
       <span class="modal-title-light">Reset your password</span>
-      <button class="modal-close-light" onclick="closeModal('m-forgot')">×</button>
+      <button class="modal-close-light" onclick="closeModal('m-forgot')"><i class="ti ti-x"></i></button>
     </div>
     <div class="modal-body">
       <div id="fp-supabase" class="hidden">
@@ -1379,10 +1376,10 @@ serve(async (req) =&gt; {
 
 <!-- ═══════════ MODAL: CALENDAR ═══════════ -->
 <div id="m-cal" class="hidden modal-wrap">
-  <div class="modal-light" style="width:320px">
+  <div class="modal-light" style="width:min(320px,92vw)">
     <div class="modal-hdr-light">
       <span class="modal-title-light">Jump to month</span>
-      <button class="modal-close-light" onclick="closeModal('m-cal')">×</button>
+      <button class="modal-close-light" onclick="closeModal('m-cal')"><i class="ti ti-x"></i></button>
     </div>
     <div class="modal-body" id="cal-body"></div>
   </div>
