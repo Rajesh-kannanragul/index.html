@@ -124,7 +124,7 @@ select.inp{cursor:pointer}
 .cat-badge{font-size:11px;padding:3px 9px;border-radius:20px;white-space:nowrap;font-weight:600}
 
 /* ── Back button ── */
-.back-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px 8px 10px;border-radius:24px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#e8f0fe;cursor:pointer;font-size:13px;font-weight:600;transition:all .18s;font-family:inherit}
+.back-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px 8px 10px;border-radius:24px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#e8f0fe;cursor:pointer;font-size:13px;font-weight:600;transition:all .18s;font-family:inherit;position:relative;z-index:10005}
 .back-btn:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.45);transform:translateX(-2px)}
 .back-arrow{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;transition:all .18s;font-size:14px}
 .back-btn:hover .back-arrow{background:#2a78d6}
@@ -180,7 +180,7 @@ select.inp{cursor:pointer}
 .budget-prompt{background:#FFF9E6;border:1.5px solid #F59E0B;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:16px}
 
 /* ── MODAL ── */
-.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:20000;backdrop-filter:blur(4px)}
 .modal-dark{background:#1a2744;border-radius:20px;width:min(460px,94vw);max-height:92vh;overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.1);box-shadow:0 24px 60px rgba(0,0,0,.45)}
 .modal-light{background:#fff;border-radius:20px;width:min(480px,94vw);max-height:92vh;overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(0,0,0,.1);box-shadow:0 16px 48px rgba(0,0,0,.15)}
 .modal-hdr-dark{padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between}
