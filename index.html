@@ -1435,13 +1435,30 @@ function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+  
+  // Close onboarding tutorial if we navigate away from the dashboard
+  if (id !== 'pg-dashboard') {
+    if (typeof endTutorial === 'function') {
+      endTutorial(false);
+    } else {
+      const overlay = document.getElementById('tutorial-overlay');
+      if (overlay) overlay.classList.remove('active');
+      if (typeof tutorialTimer !== 'undefined') clearTimeout(tutorialTimer);
+    }
+  }
+
   if(id === 'pg-auth'){
     if(typeof CatchGame !== 'undefined') CatchGame.init();
   } else {
     if(typeof CatchGame !== 'undefined') CatchGame.stop();
   }
   if(id === 'pg-dashboard'){
-    const isVisited = localStorage.getItem('budget_detector_cal_visited') === 'true';
+    let isVisited = false;
+    try {
+      isVisited = localStorage.getItem('budget_detector_cal_visited') === 'true';
+    } catch (e) {
+      console.warn('localStorage is not accessible:', e);
+    }
     const badge = document.getElementById('cal-badge');
     const calBtn = document.getElementById('btn-calendar');
     if (badge) {
