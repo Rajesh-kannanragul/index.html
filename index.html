@@ -293,10 +293,88 @@ select.inp{cursor:pointer}
 .coin{width:20px;height:20px;background:#eda100;border-radius:50%;position:absolute;top:-20px;left:50%;transform:translateX(-50%);animation:coinDrop 1.8s ease-in infinite}
 .coin2{animation-delay:.6s}.coin3{animation-delay:1.2s}
 @keyframes coinDrop{0%{opacity:0;top:-20px}20%{opacity:1}80%{opacity:1;top:30px}100%{opacity:0;top:50px}}
-.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:36px 24px;max-width:960px;margin:0 auto}
-.feat-card{background:#fff;border:1px solid rgba(0,0,0,.09);border-radius:12px;padding:1.5rem}
-.feat-card h3{font-size:15px;font-weight:700;margin-bottom:8px;color:#1a1a18}
-.feat-card p{font-size:13px;color:#5f5e5a;line-height:1.7}
+/* 3D Glassmorphic Features Grid */
+.feat-container-3d {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  padding: 36px 24px 50px;
+  max-width: 960px;
+  margin: 0 auto;
+  perspective: 1500px;
+}
+@media (max-width: 768px) {
+  .feat-container-3d {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 24px 16px;
+  }
+}
+.card-3d {
+  position: relative;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  padding: 28px 22px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transform-style: preserve-3d;
+  transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: transform 0.12s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.25s ease, background 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+.card-3d:hover {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 16px 48px rgba(42, 120, 214, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+.card-3d-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 65%);
+  pointer-events: none;
+}
+.card-3d-content {
+  transform: translateZ(24px);
+  pointer-events: none;
+}
+.card-3d-icon {
+  font-size: 28px;
+  margin-bottom: 12px;
+  display: inline-block;
+  transform: translateZ(40px);
+}
+.card-3d h3 {
+  font-size: 16px;
+  font-weight: 750;
+  margin-bottom: 8px;
+  color: #1a1a18;
+  transform: translateZ(32px);
+}
+.card-3d p {
+  font-size: 13px;
+  color: #5f5e5a;
+  line-height: 1.65;
+  transform: translateZ(16px);
+}
+@keyframes floatAnim {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(0.4deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+.card-3d:not(:hover) {
+  animation: floatAnim 4.5s ease-in-out infinite;
+}
+.card-3d:nth-child(2):not(:hover) {
+  animation-delay: 1.5s;
+}
+.card-3d:nth-child(3):not(:hover) {
+  animation-delay: 3s;
+}
 .lp-footer{padding:24px;border-top:1px solid rgba(0,0,0,.09);display:flex;justify-content:center;gap:32px;font-size:13px;background:#fff}
 .lp-footer a{color:#5f5e5a;cursor:pointer;text-decoration:none}.lp-footer a:hover{color:#1a1a18}
 .divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:#888780;font-size:12px}
@@ -845,10 +923,31 @@ select.inp{cursor:pointer}
     <p>Real database. Real auth. Set your own grocery budget, log UPI expenses daily, and get smart alerts — all powered by <strong>Supabase</strong>.</p>
     <button class="btn btn-primary" style="padding:13px 32px;font-size:15px;border-radius:10px" onclick="showAuth('register')">Get started — it's free</button>
   </div>
-  <div class="feat-grid">
-    <div class="feat-card"><h3>☁️ Real backend</h3><p>Powered by Supabase — a PostgreSQL database in the cloud. Your data is safe, persistent, and accessible from any device.</p></div>
-    <div class="feat-card"><h3>🔐 Real auth</h3><p>Email/password authentication handled by Supabase Auth. Secure JWT tokens, password reset via email — no fake codes.</p></div>
-    <div class="feat-card"><h3>📊 Your own budget</h3><p>Set any budget amount you want. Smart period alerts, category tracking, analytics charts, and CSV export — all synced to the cloud.</p></div>
+  <div class="feat-container-3d">
+    <div class="card-3d">
+      <div class="card-3d-shine"></div>
+      <div class="card-3d-content">
+        <span class="card-3d-icon">☁️</span>
+        <h3>Cloud Database Sync</h3>
+        <p>Instantly persists your transactions to a secure, real-time Supabase PostgreSQL backend in the cloud. Access your budget data securely from any device, anywhere.</p>
+      </div>
+    </div>
+    <div class="card-3d">
+      <div class="card-3d-shine"></div>
+      <div class="card-3d-content">
+        <span class="card-3d-icon">🔐</span>
+        <h3>Identity &amp; Security</h3>
+        <p>Features industrial-grade email authentication and JWT tokens managed by Supabase. Your private financial logs are protected by strict row-level security policy gates.</p>
+      </div>
+    </div>
+    <div class="card-3d">
+      <div class="card-3d-shine"></div>
+      <div class="card-3d-content">
+        <span class="card-3d-icon">📊</span>
+        <h3>Smart Budget Assistant</h3>
+        <p>Configure custom budgets for categories, log daily transactions with transaction timestamps, and trigger automatic visual limit warnings.</p>
+      </div>
+    </div>
   </div>
   <div class="lp-footer"><a>About</a><a>Contact</a><a>Privacy Policy</a><a>Terms &amp; Conditions</a></div>
 </div>
@@ -1583,7 +1682,7 @@ async function doGoogleLogin(errId = 'login-err', btnId = 'google-login-btn') {
   const { error } = await A.sb.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: window.location.origin
+      redirectTo: window.location.href.split('?')[0].split('#')[0]
     }
   });
   if (error) {
@@ -3779,7 +3878,34 @@ function setupAuthListener(){
   });
 }
 
-startup().then(()=>{ if(A.sb) setupAuthListener(); });
+function init3DCardAnimation() {
+  document.querySelectorAll('.card-3d').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const xc = rect.width / 2;
+      const yc = rect.height / 2;
+      const rotateY = ((x - xc) / xc) * 12;
+      const rotateX = -((y - yc) / yc) * 12;
+      card.style.setProperty('--rx', `${rotateX}deg`);
+      card.style.setProperty('--ry', `${rotateY}deg`);
+      card.style.setProperty('--mx', `${(x / rect.width) * 100}%`);
+      card.style.setProperty('--my', `${(y / rect.height) * 100}%`);
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.setProperty('--rx', '0deg');
+      card.style.setProperty('--ry', '0deg');
+      card.style.setProperty('--mx', '50%');
+      card.style.setProperty('--my', '50%');
+    });
+  });
+}
+
+startup().then(()=>{
+  if(A.sb) setupAuthListener();
+  init3DCardAnimation();
+});
 
 /* ════════════════════════════════════════════
    CALCULATOR LOGIC
