@@ -828,16 +828,18 @@ select.inp{cursor:pointer}
 <!-- ═══════════ LANDING ═══════════ -->
 <div id="pg-landing" class="page">
   <div class="nav">
-    <span class="logo">Budget <span>Detector</span></span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <img src="logo.jpg" alt="Logo" style="height:32px;width:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,0,0,0.1)">
+      <span class="logo">Budget <span>Detector</span></span>
+    </div>
     <div style="display:flex;gap:8px;align-items:center">
       <button class="btn btn-sm" onclick="showAuth('login')">Log in</button>
       <button class="btn btn-primary btn-sm" onclick="showAuth('register')">Sign up free</button>
     </div>
   </div>
   <div class="hero">
-    <div class="coin-anim">
-      <div class="coin"></div><div class="coin coin2"></div><div class="coin coin3"></div>
-      <div class="locker">🔒</div>
+    <div style="margin-bottom: 24px; display: inline-block;">
+      <img src="logo.jpg" alt="Logo" style="width: 120px; height: 120px; border-radius: 28px; object-fit: cover; box-shadow: 0 12px 32px rgba(42, 120, 214, 0.2); border: 2px solid #fff;">
     </div>
     <h1>Yo! Track your money smarter.</h1>
     <p>Real database. Real auth. Set your own grocery budget, log UPI expenses daily, and get smart alerts — all powered by <strong>Supabase</strong>.</p>
@@ -854,7 +856,10 @@ select.inp{cursor:pointer}
 <!-- ═══════════ SUPABASE SETUP ═══════════ -->
 <div id="pg-setup" class="page">
   <div class="nav">
-    <span class="logo">Budget <span>Detector</span></span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <img src="logo.jpg" alt="Logo" style="height:32px;width:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,0,0,0.1)">
+      <span class="logo">Budget <span>Detector</span></span>
+    </div>
     <span class="sb-tag">⚡ Supabase Setup</span>
   </div>
   <div class="container" style="max-width:700px">
@@ -1024,43 +1029,15 @@ serve(async (req) =&gt; {
     <div class="bg-bubble bg-bubble-2"></div>
   </div>
   <div class="nav" style="position:relative;z-index:10;background:rgba(255,255,255,0.75);backdrop-filter:blur(10px)">
-    <span class="logo" style="cursor:pointer" onclick="showPage('pg-landing')">Budget <span>Detector</span></span>
+    <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showPage('pg-landing')">
+      <img src="logo.jpg" alt="Logo" style="height:32px;width:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,0,0,0.1)">
+      <span class="logo" style="margin:0">Budget <span>Detector</span></span>
+    </div>
   </div>
   <div class="auth-wrap">
     <div class="auth-card">
-      <div class="catch-money-container" id="catch-money-container">
-        <div class="catch-bg-cloud catch-bg-cloud-1">☁️</div>
-        <div class="catch-bg-cloud catch-bg-cloud-2">☁️</div>
-        <div class="catch-mode-badge" id="catch-mode-badge">Auto Catch</div>
-        <div class="catch-score-board">Saved: <span>₹</span><span id="catch-score-val">0</span></div>
-        <div class="boy-char">
-          <svg class="boy-svg" viewBox="0 0 100 100" width="100%" height="100%">
-            <g class="boy-head">
-              <path d="M34 32 C34 26, 66 26, 66 32 Z" fill="#4b3621" />
-              <circle cx="50" cy="35" r="13" fill="#ffdbac" />
-              <path d="M34 29 C34 19, 66 19, 66 29 Z" fill="#e34948" />
-              <path d="M32 29 L68 29 C68 29, 65 33, 50 33 C35 33, 32 29, 32 29 Z" fill="#c93534" />
-              <circle cx="50" cy="18" r="4.5" fill="#fff" />
-              <circle class="boy-eye" cx="44" cy="34" r="2.2" fill="#1a1a18" />
-              <circle class="boy-eye" cx="56" cy="34" r="2.2" fill="#1a1a18" />
-              <circle cx="40" cy="37" r="2.5" fill="#f09595" opacity="0.6" />
-              <circle cx="60" cy="37" r="2.5" fill="#f09595" opacity="0.6" />
-              <path d="M46 39 Q50 43 54 39" stroke="#1a1a18" stroke-width="1.8" stroke-linecap="round" fill="none" />
-            </g>
-            <g class="boy-body">
-              <path d="M35 48 C35 48, 25 78, 25 78 L75 78 C75 78, 65 48, 65 48 Z" fill="#2a78d6" />
-              <path id="boy-pocket" class="boy-pocket" d="M38 62 L62 62 C62 62, 59 75, 50 75 C41 75, 38 62, 38 62 Z" fill="#1d65c0" stroke="#fff" stroke-width="1.2" />
-              <path d="M44 62 L56 62" stroke="#13478c" stroke-width="1" />
-              <path d="M40 48 C40 48, 50 56, 60 48" stroke="#1d65c0" stroke-width="2.5" fill="none" />
-            </g>
-            <g class="boy-arms">
-              <path d="M33 50 Q21 60 36 65" stroke="#2a78d6" stroke-width="5.5" stroke-linecap="round" fill="none" />
-              <path d="M67 50 Q79 60 64 65" stroke="#2a78d6" stroke-width="5.5" stroke-linecap="round" fill="none" />
-              <circle cx="36" cy="65" r="3.5" fill="#ffdbac" />
-              <circle cx="64" cy="65" r="3.5" fill="#ffdbac" />
-            </g>
-          </svg>
-        </div>
+      <div style="text-align:center;margin-bottom:1.5rem">
+        <img src="logo.jpg" alt="App Logo" style="width:120px;height:120px;border-radius:24px;object-fit:cover;box-shadow:0 8px 24px rgba(42,120,214,0.15);border:1px solid rgba(0,0,0,0.06);margin:10px auto;">
       </div>
       <div class="tab-bar">
         <button class="tab active" id="tab-login" onclick="switchTab('login')">Log in</button>
@@ -1117,7 +1094,10 @@ serve(async (req) =&gt; {
 <!-- ═══════════ DASHBOARD ═══════════ -->
 <div id="pg-dashboard" class="page">
   <div class="nav">
-    <span class="logo">Budget <span>Detector</span></span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <img src="logo.jpg" alt="Logo" style="height:32px;width:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,0,0,0.1)">
+      <span class="logo">Budget <span>Detector</span></span>
+    </div>
     <div style="display:flex;align-items:center;gap:10px">
       <button class="btn btn-sm btn-calendar" onclick="openCal()" title="Calendar" id="btn-calendar">
         <i class="ti ti-calendar"></i>
@@ -1184,11 +1164,11 @@ serve(async (req) =&gt; {
 <!-- ═══════════ MONTH PAGE ═══════════ -->
 <div id="pg-month" class="page">
   <div class="nav nav-dark">
-    <button class="back-btn" onclick="renderDash()">
-      <span class="back-arrow"><i class="ti ti-arrow-left" style="font-size:13px"></i></span>
-      <span>Back</span>
-    </button>
-    <span class="logo">Budget <span>Detector</span></span>
+    <button onclick="renderDash()" style="background:none; border:none; color:#e8f0fe; cursor:pointer; font-size:20px; font-weight:bold; margin-right:16px; padding:0; display:inline-flex; align-items:center; user-select:none; transition:opacity .15s" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Back">&lt;-</button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <img src="logo.jpg" alt="Logo" style="height:32px;width:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.15)">
+      <span class="logo">Budget <span>Detector</span></span>
+    </div>
     <div id="month-budget-tag" style="font-size:13px;color:#94a3c4;background:rgba(255,255,255,.08);padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.12);white-space:nowrap"></div>
   </div>
   <div class="container" style="max-width:860px">
@@ -1818,16 +1798,36 @@ async function saveBudgetDB(y,m,amount){
 
 async function getTxs(y,m){
   const k=cacheKey(y,m);
-  if(A.cache.transactions[k]) return A.cache.transactions[k];
+  if(A.cache.transactions[k]) {
+    for (const day in A.cache.transactions[k]) {
+      if (Array.isArray(A.cache.transactions[k][day])) {
+        A.cache.transactions[k][day].sort((a, b) => {
+          const timeA = a.time || '00:00';
+          const timeB = b.time || '00:00';
+          return timeA.localeCompare(timeB);
+        });
+      }
+    }
+    return A.cache.transactions[k];
+  }
   if(!A.sb||!uid()){ A.cache.transactions[k]={}; return {}; }
   const {data}=await A.sb.from('transactions')
     .select('*').eq('user_id',uid()).eq('year',y).eq('month',m)
-    .order('day').order('created_at');
+    .order('day').order('tx_time').order('created_at');
   const grouped={};
   (data||[]).forEach(tx=>{
     if(!grouped[tx.day])grouped[tx.day]=[];
     grouped[tx.day].push({id:tx.id,amount:Number(tx.amount),cat:tx.category,desc:tx.description,time:tx.tx_time});
   });
+  for (const day in grouped) {
+    if (Array.isArray(grouped[day])) {
+      grouped[day].sort((a, b) => {
+        const timeA = a.time || '00:00';
+        const timeB = b.time || '00:00';
+        return timeA.localeCompare(timeB);
+      });
+    }
+  }
   A.cache.transactions[k]=grouped;
   return grouped;
 }
